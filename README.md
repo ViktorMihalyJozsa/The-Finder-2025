@@ -1,36 +1,56 @@
-F I N D E R - J a v a S c r i p t - M i n e s w e e p e r
+# THE FINDER 2025
 
-Created by: V M J & ASK
+A JavaScript-based Minesweeper-style game created by VMJ & ASK.
 
-Using the minesweeper game in Finder.
+## Game Description
 
-The goal of the game is for the player to uncover all the fields that do not contain
-mines. The locations of the mines are random, and the player must find out where the mines are while uncovering the fields.
+The Finder is an engaging grid-based game where players must strategically uncover squares while avoiding hidden targets.
 
-The game ends when the player uncovers all the fields that do not contain
-mines, or when the mine field is revealed.
+## Game Rules and Features
 
-In the game, the player has the option to place flags on the fields that he thinks contain
-mines. The player wins if
-all fields are revealed, and loses if the mine field is revealed.
+1. **Gameplay Basics:**
+   - The game is played on a grid board with varying sizes based on difficulty (easy, medium, hard)
+   - Your goal is to uncover all safe squares without revealing any targets
+   - Targets are randomly placed across the board
 
-In the game, the player has the option to restart the game and change the difficulty
-level. By changing the difficulty level, the size of the game board
-and the number of mines also change.
+2. **Game Features:**
+   - Multiple difficulty levels that affect board size and number of targets
+   - Timer to track your gameplay duration
+   - Flag placement option to mark suspected target locations
+   - Game restart option available at any time
+   - Difficulty level selection
+   - Stop/pause game functionality
 
-In the game, the player has the option to measure the time, which shows the time that has passed during the game.
+3. **Win/Lose Conditions:**
+   - Win: Successfully reveal all safe squares
+   - Lose: Reveal a target square
 
-In the game, the player has the option to stop the game if he/she decides
-that he/she does not want to continue the game.
+## Controls and Options
 
-In the game, the player has the option to restart the game if he/she decides
-that he/she wants to play a new game.
+- Left-click to reveal squares
+- Right-click to place/remove flags
+- Use the difficulty selector to change game complexity
+- Reset button available for starting new games
 
-In the game, the player has the option to end the game if the player
-has won or lost.
+## Created By
+VMJ & ASK
 
-       Good luck and have fun !
-    Thank you for your attention !
-         Best regard : VMJ
+       Good luck and have fun!
+    Thank you for your attention!
+has to mark them with flags.
 
-                                                     
+~ The player can discover squares by left-clicking and mark
+targets by right-clicking.
+
+~ The game ends when the player discovers a target (loses),
+or when all squares have been discovered and all targets have been correctly marked (wins).
+
+~ A timer measures the playing time and the player can
+try to solve the board as quickly as possible.
+
+~ The game can be restarted by pressing the main button and the difficulty level can
+be selected from the drop-down menu.
+
+
+Have a nice time and have fun, the author: VMJ
+>>>>>>> b21478c720d991432db489b5e6efcbfafc383d7c
