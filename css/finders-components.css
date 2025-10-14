@@ -1,0 +1,305 @@
+/* ======================================================================== *\
+
+    F I N D E R S - C O M P O N E N T S . C S S
+
+    Ez a CSS-fájl tartalmazza a játék összetevőinek stílusait.
+
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    A stílusok a következő sorrendben vannak írva:
+
+        1. H T M L  &  B O D Y
+        2. H E A D E R
+        3. M A I N
+            3.1 C O N T R O L - P A N E L
+                3.1.1 A C T I O N - B U T T O N
+                3.1.2 M A R K E R   A N D   T I M E R
+                3.1.3 G A M E - I N F O   A N D   L E V E L - S E L E C T O R
+                3.1.4 D R O P D O W N - C O N T E N T
+                3.1.5 G A M E - P A G E
+            3.2 G A M E - C O N T A I N E R
+        4. F O O T E R
+
+\* ======================================================================== */
+
+/* ======================================================================== *\
+    H T M L  &  B O D Y
+\* ======================================================================== */
+
+html, body {
+    font-family:  'Caveat', sans-serif;
+    font-size:    16px;
+}
+
+body {
+    background-image:     url("../images/wooden-background.webp");
+    background-size:      cover;
+    background-repeat:    no-repeat;
+    background-position:  center;
+}
+
+        .landscape-warning {
+            background-color:  rgba(255, 0, 0, 0.75);  /* Enyhén sötétebb háttér a jobb kontrasztért */
+
+            font-size:         clamp(1.5rem, 3vw, 2em);
+            font-weight:       bold;
+            letter-spacing:    clamp(0.15rem, 0.3vw, 0.2em);
+            line-height:       10vh;
+            color:             white;
+            text-shadow:       0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 1), -0.1rem -0.1rem black;
+        }
+
+
+/* ======================================================================== *\
+    H E A D E R
+\* ======================================================================== */
+
+header {
+    background-color:  rgba(0, 0, 0, 0.5);
+}
+
+    .header-logo {
+        background-image:     url('../images/logo.webp');
+        background-size:      contain;
+        background-repeat:    no-repeat;
+        background-position:  center;
+    }
+        
+    .header-logo-text {
+        font-size:            clamp(0.5rem, 1vw, 0.75em);
+        font-weight:          bold;
+        letter-spacing:       clamp(0.25rem, 0.5vw, 0.375em);
+        line-height:          2.5vh;
+        color:                white;
+        text-shadow:          0.1rem 0.1rem 0.2rem rgba(0, 0, 0, 1), -0.1rem -0.1rem black;
+        text-align:           left;
+    }
+
+.header-text {
+    text-transform:  uppercase;
+    font-size:       clamp(2rem, 4vw, 3em);
+    font-weight:     bold;
+    letter-spacing:  clamp(0.4rem, 0.8vw, 0.6em);
+    line-height:     10vh;
+    color:           rgba(206, 146, 0, 1); 
+    text-shadow:     0.3em 0.3em 0.6em rgba(0, 0, 0, 1), -0.1em -0.1em black;
+    text-align:      left;
+}
+
+
+/* ======================================================================== *\
+   M A I N 
+\* ======================================================================== */
+
+    /* ======================================================================== *\
+       C O N T R O L - P A N E L
+    \* ======================================================================== */
+
+    .control-panel-container {
+        background-color:  rgba(0, 0, 0, 0.25);
+    }
+
+        .control-panel-container:hover {
+            background-color:  rgba(0, 0, 0, 0.5);
+            transition:        background-color 0.5s;
+        }
+
+        .control-panel-container:active {
+            background-color:  rgba(0, 0, 0, 0.5);
+            transition:        background-color 0.5s;
+        }
+
+
+        /* ======================================================================== *\
+           A C T I O N - B U T T O N
+        \* ======================================================================== */
+
+        #main-action-button {
+            cursor:               pointer;
+
+            background-size:      cover;
+            background-repeat:    no-repeat;
+            background-position:  center;
+        }
+
+            #main-action-button:hover {
+                filter:      brightness(1.2);
+                transition:  filter 0.8s;
+            }
+
+            .button-start {background-image:  url('../images/button-start.webp');}
+            .button-lost {background-image: url('../images/button-lost.webp');}
+            .button-won {background-image: url('../images/button-won.webp');}
+
+
+        /* ======================================================================== *\
+            M A R K E R   A N D   T I M E R
+        \* ======================================================================== */
+
+        .marker-counter-number,
+        .time-counter-number {
+            background-image:     url("../images/counter.webp");
+            background-size:      cover;
+            background-repeat:    no-repeat;
+            background-position:  center;
+
+            font-size:            clamp(2rem, 3.2vw, 2.4em);
+            font-weight:          bold;
+            letter-spacing:       clamp(0.2rem, 0.32vw, 0.24em);
+            color:                rgba(206, 146, 0, 1);
+            text-shadow:          0.24rem 0.24rem 0.36rem black, -0.1rem -0.1rem black;
+        }
+
+
+        /* ======================================================================== *\
+            G A M E - I N F O   A N D   L E V E L - S E L E C T O R
+        \* ======================================================================== */
+
+        .game-info-text,
+        .level-selector-text {
+            cursor:            pointer;
+            text-decoration:   none;
+
+            background-color:  rgba(206, 146, 0, 0.9);
+            border:            0.1vh solid black;
+            border-radius:     1vh;
+
+            font-family:       'Caveat', sans-serif;
+            font-size:         clamp(1rem, 1.5vw, 1.25em);
+            font-weight:       bold;
+            letter-spacing:    clamp(0.1rem, 0.15vw, 0.125em);
+            color:             rgba(255, 255, 255, 0.75);
+            text-shadow:       0.125rem 0.125rem 0.25rem black, -0.1rem -0.1rem black;
+        }
+
+            .game-info-text:hover, 
+            .level-selector-text:hover {
+                text-decoration:  none;
+                filter:           brightness(1.2);
+                transition:       filter 0.5s;
+            }
+
+
+        /* ======================================================================== *\
+            D R O P D O W N - C O N T E N T
+        \* ======================================================================== */
+
+        .dropdown-content {
+            background-color:  rgba(206, 146, 0, 0.9);
+        }
+
+
+        /* ======================================================================== *\
+            G A M E - P A G E
+        \* ======================================================================== */
+
+        .game-info-page {
+            text-align:  center;
+        }
+
+            h3 {
+                margin:          1.5rem 0rem 0.5rem 0rem;
+
+                font-size:       clamp(1.2rem, 2.4vw, 1.8em);
+                font-weight:     bold;
+                letter-spacing:  clamp(0.12rem, 0.24vw, 0.18em);
+                color:           rgba(255, 255, 255, 0.25);
+                text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
+            }
+
+            p {
+                font-size:       clamp(1rem, 2vw, 1.5em);
+                letter-spacing:  clamp(0.1rem, 0.2vw, 0.15em);
+                color:           rgba(255, 255, 255, 0.25);
+                text-shadow:     -0.1em -0.1em black;
+            }
+
+            a {
+                text-decoration:  none;
+                font-size:        clamp(1.5rem, 2vw, 1.5em);
+                letter-spacing:   clamp(0.15rem, 0.2vw, 0.15em);
+                color:            rgba(206, 146, 0, 0.75);
+                text-shadow:      0.1rem 0.1rem 0.1rem rgba(68, 68, 68, 1), -0.1rem -0.1rem black;
+            }
+
+                a:hover {
+                    text-decoration:  none;
+                    color:            rgba(139, 0, 0, 0.75);
+                    transition:       color 0.5s;
+                }
+
+
+    /* ======================================================================== *\
+        G A M E - C O N T A I N E R
+    \* ======================================================================== */
+
+    .game-container-style {
+        border:            0.1vh solid black;
+        background-color:  rgb(36, 0, 0);
+    }
+
+        .field {
+            position:             absolute;
+            box-sizing:           border-box;
+            width:                var(--field-size);
+            height:               var(--field-size);
+
+            border:               0.0625rem solid rgba(0, 0, 0, 0.75);  /* 1px solid black */
+    
+            background-size:      cover;
+            background-repeat:    no-repeat;
+            background-position:  center;
+        }
+        
+        .field.number-0 {background-image: url('../images/0.webp');}
+    
+        .number-0 {background-image: url('../images/0.webp');}
+        .number-1 {background-image: url('../images/1.webp');}
+        .number-2 {background-image: url('../images/2.webp');}
+        .number-3 {background-image: url('../images/3.webp');}
+        .number-4 {background-image: url('../images/4.webp');}
+        .number-5 {background-image: url('../images/5.webp');}
+        .number-6 {background-image: url('../images/6.webp');}
+        .number-7 {background-image: url('../images/7.webp');}
+        .number-8 {background-image: url('../images/8.webp');}
+    
+        .hidden {background-image: url('../images/hidden.webp');}
+        .target {background-image: url('../images/target.webp');}
+        .unmarked-target {background-image: url('../images/unmarked-target.webp');}
+        .marker {background-image: url('../images/marker.webp');}
+        .incorrect-marker {background-image: url('../images/incorrect-marker.webp');}
+
+
+/* ======================================================================== *\
+    F O O T E R
+\* ======================================================================== */
+
+footer {
+    background-color:  rgba(0, 0, 0, 0.5);
+}
+
+    footer a {
+        text-decoration:  none;
+        font-size:        clamp(1.5rem, 2vw, 1.5em);
+        letter-spacing:   clamp(0.15rem, 0.2vw, 0.15em);
+        color:            rgba(206, 146, 0, 1);
+    }
+
+    footer a:hover {
+        text-decoration:  none;
+        color:            rgba(139, 0, 0, 0.75);
+        transition:       color 0.5s;
+    }
+
+.footer-text {
+    font-size:       clamp(1rem, 2vw, 1.5em);
+    font-weight:     bold;
+    letter-spacing:  clamp(0.1rem, 0.2vw, 0.15em);
+    color:           rgba(255, 255, 255, 0.75);
+    text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
+}
+
+
+/* ======================================================================== *\
+    E N D   O F   F I N D E R S - C O M P O N E N T S . C S S
+\* ======================================================================== */

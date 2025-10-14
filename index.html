@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The Finder...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Viktor M Jozsa">
+    <meta name="description" 
+          content="Játssz egy szórakoztató és kihívást jelentő keresőjátékkal online! 
+                   Viktor M Jozsa webfejlesztőként készítette ezt a klasszikus játékot.">
+    <link rel="icon" type="image/webp" href="images/favicon.webp" sizes="any">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" 
+          integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/finders-layout.css">
+    <link rel="stylesheet" href="css/finders-components.css">
+</head>
+<body>
+    <header>
+        <div class="header-logo header-logo-text" aria-label="Finders Logo">VMJ</div>
+        <div class="header-text">The finder ...</div>
+    </header>
+    <main>
+        <div id="control-panel" class="control-panel-container ui-element">
+            <span id="marker-counter" class="marker-counter-number ui-element">000</span>
+            <span id="game-info" class="game-info-text ui-element">GAME</span>
+            <div id="main-action-button" class="button-start ui-element" aria-label="Start Game"></div>
+            <span id="time-counter" class="time-counter-number ui-element">000</span>
+            <select id="level-selector" class="level-selector-text ui-element">
+                <option value="easy">EASY</option>
+                <option value="medium">MEDIUM</option>
+                <option value="hard">HARD</option>
+            </select>  
+        </div>
+        <div id="gameContainer" class="game-container-style ui-element" aria-label="Finders game board"></div> 
+        <div id="dropdown-content" class="dropdown-content ui-element"></div>
+        <script src="js/finders.js" defer></script>
+        <script src="js/dropdown.js" defer></script>
+    </main>
+    <footer>
+        <span class="footer-text">Best regards from:
+            <a href="https://viktormihalyjozsa.github.io/VMJ/" title="Dear Page" target="_blank">VMJ</a>
+            ~ 2025
+        </span>
+    </footer>
+    <div id="warning" class="landscape-warning">
+        Please rotate the device back
+        <br>
+        to portrait mode! 
+        <br>
+        📱🔄
+    </div>
+    <script src="js/warning.js" defer></script>
+</body>
+</html>

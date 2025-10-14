@@ -1,0 +1,353 @@
+/* ======================================================================== *\
+
+    F I N D E R S - L A Y O U T . C S S
+
+    CSS-fájl a játék elrendezéséhez.
+
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    Az elrendezések a következő sorrendben vannak írva:
+
+        1. H T M L  &  B O D Y
+        2. H E A D E R
+        3. M A I N
+            3.1 C O N T R O L - P A N E L
+                3.1.1 A C T I O N - B U T T O N
+                3.1.2 M A R K E R   A N D   T I M E R
+                3.1.3 G A M E - I N F O   A N D   L E V E L - S E L E C T O R
+                3.1.4 D R O P D O W N - C O N T E N T
+                3.1.5 G A M E - P A G E
+            3.2 G A M E - C O N T A I N E R
+        4. F O O T E R
+
+    A fájl tartalmazza a játék elrendezéséhez szükséges stílusokat.
+    A stílusok a játék megjelenését és elrendezését befolyásolják.
+
+\* ======================================================================== */
+
+/* ======================================================================== *\
+    H T M L  &  B O D Y
+\* ======================================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin:   0;     /* Nincs külső margó */
+    padding:  0;     /* Nincs belső margó */
+    height:   100%;  /* A képernyő magassága */
+    width:    100%;  /* A képernyő szélessége */
+}
+
+/* Kényszerítjük, hogy a játék konténer mindig álló orientációban legyen */
+body {
+    display:           flex;         /* Flexbox */
+    justify-content:   center;       /* Középre igazítjuk */
+    align-items:       center;       /* Középre igazítjuk */
+    overflow:          hidden auto;  /* Nem engedjük a görgetést, csak ha szükséges */
+}
+
+    #warning {
+        display:          none; /* Alapértelmezetten rejtve van */
+        flex-direction:   column;
+        justify-content:  center;
+        align-items:      center;
+        text-align:       center;
+
+        position:         fixed;
+        top:              0;
+        left:             0;
+        width:            100vw;
+        height:           100vh;
+        padding:          5vh 10vw;
+
+        opacity:          0;  /* Kezdeti állapot */
+        transition:       opacity 0.5s ease-in-out;
+        z-index:          1000;
+    }   
+    
+        #warning.show {
+            display:  block;
+            opacity:  1;
+        }
+    
+
+/* ======================================================================== *\
+    H E A D E R
+\* ======================================================================== */
+
+header {
+    position:          fixed;
+    top:               0;
+
+    display:           flex;
+    justify-content:   flex-start;
+    align-items:       center;
+
+    width:             100%;
+    height:            10vh;
+    padding:           0vh 5vw 0vh 5vw;
+}
+
+    .header-logo {
+        width:   10vh;
+        height:  10vh;
+    }
+
+    .header-text {
+        width:   auto;
+        height:  10vh;
+    }
+
+
+/* ======================================================================== *\
+    M A I N
+\* ======================================================================== */
+
+main {
+    display:          flex;
+    flex-direction:   column;
+    align-items:      center;
+    justify-content:  center;
+
+    width:            100%;
+    height:           auto;
+    padding:          4vh 0vw 2vh 0vw;
+    margin:           0;
+}
+
+
+    /* ======================================================================== *\
+        C O N T R O L - P A N E L
+    \* ======================================================================== */
+
+    .control-panel-container {
+        position:       relative;
+
+        width:          30vw;  /* 30% of the screen width */
+        height:         15vh;  /* 15% of the screen height */
+        margin-bottom:  1vh;
+        padding:        0;
+
+        border:         none;
+        border-radius:  1vh;
+    }
+
+
+        /* ======================================================================== *\
+            A C T I O N - B U T T O N
+        \* ======================================================================== */
+
+        #main-action-button {
+            position:       absolute;
+            top:            0;
+            left:           50%;
+            transform:      translateX(-50%);
+
+            width:          30%;   /* 30% of the control panel */
+            height:         100%;  /* 100% of the control panel */
+            margin:         0;
+            padding:        0;
+
+            border:         0.1vh solid black;
+            border-radius:  1.5vh;
+        }
+
+
+        /* ======================================================================== *\
+            M A R K E R   A N D   T I M E R
+        \* ======================================================================== */
+
+        .marker-counter-number {
+            position:  absolute;
+            top:       1vh;
+            left:      0;
+        }
+
+        .time-counter-number {
+            position:  absolute;
+            top:       1vh;
+            right:     0;
+        }
+
+        .marker-counter-number, 
+        .time-counter-number {
+            display:          flex;
+            justify-content:  center;
+            align-items:      center;
+
+            width:            9vw;  /* 30% of the control panel */
+            height:           auto;
+            padding:          0;
+            margin:           0;
+            border:           0.1vh solid black;
+            border-radius:    1vh;
+        }
+
+
+        /* ======================================================================== *\
+            G A M E - I N F O   A N D   L E V E L - S E L E C T O R
+        \* ======================================================================== */
+
+        .game-info-text {
+            position:  absolute;
+            bottom:    1vh;
+            left:      0vw;
+        }
+
+        .level-selector-text {
+            position:  absolute;
+            bottom:    1vh;
+            right:     0vw;
+        }
+
+        .game-info-text,
+        .level-selector-text {
+            display:          flex;
+            justify-content:  center;
+            align-items:      center;
+            text-align:       center;
+
+            width:            9vw;    /* 30% of the control panel */
+            height:           4.5vh;  /* 30% of the control panel */  
+            padding:          0;
+            margin:           0;
+        }
+
+
+        /* ======================================================================== *\
+            D R O P D O W N - C O N T E N T
+        \* ======================================================================== */
+
+            #dropdown-content {
+                display:          none;                                           /* Kezdetben rejtve van */
+                position:         absolute;                                       /* Pozicionálás */
+                top:              27.5vh;                                         /* A szekrény tetején kezdődik */
+                left:             50%;                                            /* Középre igazítás */
+                transform:        translateX(-50%);                               /* Középre igazítás */
+
+                width:            30vw;                                           /* 30%-a a szekrény szélességének */
+                height:           0;                                              /* Kezdetben 0 a magasság */
+                padding-bottom:   3vh;                                            /* 3% padding az alján */
+                margin:           0;
+
+                overflow:         hidden;                                         /* Túlcsordulás elrejtése */
+                scrollbar-width:  none;                                           /* Firefox */
+                transition:       height 3s ease-in-out, opacity 3s ease-in-out;  /* Animáció hozzáadása */
+                z-index:          1;                                              /* A legfelső réteg */
+            }
+            
+                #dropdown-content.show {
+                    display:     block;  /* Megjelenítés */
+                    height:      30vw;   /* Változtasd ezt az értéket, ha szükséges */
+                    overflow-y:  auto;   /* Enable vertical scrolling */
+                    opacity:     1;      /* Az áttetszőség is változik */
+                }
+            
+                #dropdown-content::-webkit-scrollbar {
+                    display:  none; /* Webkit böngészőkön a scrollbar eltüntetése */
+                }                       
+
+
+        /* ======================================================================== *\
+            G A M E - P A G E
+        \* ======================================================================== */
+
+        .game-info-page {
+            display:  block;
+            width:    100%;
+            height:   100%;
+            padding:  1vh 2vh 3vh 2vh;
+        }
+
+
+    /* ======================================================================== *\
+        G A M E - C O N T A I N E R
+    \* ======================================================================== */
+
+    #gameContainer {
+        position:       relative;
+        top:            0;
+        left:           0;
+
+        width:         30vw;
+        max-width:     600px;
+        height:        auto;
+        margin:        0;
+        padding:       0;
+        aspect-ratio:  1 / 1;
+    }
+
+
+/* ======================================================================== *\
+    F O O T E R
+\* ======================================================================== */
+
+footer {
+    position:         fixed;
+    bottom:           0;
+    
+    display:          flex;
+    justify-content:  flex-end;
+    align-items:      center;
+
+    width:            100%;
+    height:           8vh;
+    padding:          0vh 5vw 0vh 5vw;
+}
+
+
+/* ======================================================================== *\
+    M E D I A - Q U E R I E S
+\* ======================================================================== */
+
+@media screen and (max-width: 768px) {
+    .control-panel-container {
+        width:   80vw;  /* 80% of the screen width */
+        height:  20vw;  /* 20% of the screen height */
+    }
+        .marker-counter-number,
+        .time-counter-number {
+            width:   24vw;  /* 30% of the control panel */
+            height:  auto;  /* Auto height */
+        }
+
+        .game-info-text,
+        .level-selector-text {
+            width:   24vw;  /* 30% of the control panel */
+            height:  6vw;   /* 30% of the control panel */
+        }
+
+        #dropdown-content {
+            display:    none;
+            height:     80vw;
+            top:        31vh;
+            left:       50%;
+            transform:  translateX(-50%);
+
+            width:      80vw;
+            height:     0;
+        }
+
+            #dropdown-content.show {
+                height:     80vw;
+            }
+
+            /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+            #dropdown-content::-webkit-scrollbar {
+                display:  none;
+            }
+
+    #gameContainer {
+        width:         80vw;   /* 80% of the screen width */
+        max-width:     600px;  /* Maximum width */
+        height:        auto;   /* Auto height */
+        aspect-ratio:  1 / 1;  /* 1:1 aspect ratio */
+    }
+}
+
+
+/* ======================================================================== *\
+    E N D   O F   F I N D E R S - L A Y O U T . C S S
+\* ======================================================================== */
