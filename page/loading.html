@@ -1,5 +1,8 @@
 <div class="loading" id="loading-overlay">
-    <h3>Loading</h3>
-    <div class="loading-percentage" id="loading-percentage">0%</div>
-    <p>Please wait while the game is being prepared...</p>
+    <h3 id="loading-title">Loading</h3>
+    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        <div class="progress-percent" id="loading-percentage">0%</div>
+    </div>
+    <p id="loading-sub">Please wait while the game is being prepared...</p>
 </div>

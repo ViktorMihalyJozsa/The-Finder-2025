@@ -716,6 +716,14 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
     img.onload = img.onerror = () => {
       loaded++;
       updatePercent();
+      // update visual progress fill and ARIA
+      const fill = document.getElementById('progress-fill');
+      const pctEl = document.getElementById('loading-percentage');
+      const progressBar = document.querySelector('.progress-bar');
+      const pct = Math.round((loaded / total) * 100);
+      if (fill) fill.style.width = pct + '%';
+      if (pctEl) pctEl.innerText = pct + '%';
+      if (progressBar) progressBar.setAttribute('aria-valuenow', pct);
     };
     img.src = src;
   });

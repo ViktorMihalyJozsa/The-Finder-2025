@@ -299,12 +299,33 @@ main {
         font-size: 1.4rem;
     }
 
-    .loading-percentage {
+    .progress-bar {
+        position: relative;
+        width: 70%;
+        max-width: 420px;
+        height: 18px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 0.8rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg,#4ade80,#06b6d4);
+        transition: width 300ms ease-out;
+    }
+
+    .progress-percent {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
         font-family: monospace;
-        font-size: 1.2rem;
-        background: rgba(255,255,255,0.06);
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
+        color: #fff;
+        font-weight: 600;
+        pointer-events: none;
     }
 
 
