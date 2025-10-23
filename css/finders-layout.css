@@ -328,6 +328,40 @@ main {
         pointer-events: none;
     }
 
+    /* Circular progress styles */
+    .circular-wrap {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin-top: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .circular { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .circle-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 8; }
+    .circle-fg { fill: none; stroke: url(#grad1); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 282.743; stroke-dashoffset: 282.743; transition: stroke-dashoffset 300ms ease-out; }
+
+    /* Add an inline gradient if url() gradient not usable in some viewers */
+    svg defs { display: none; }
+
+    /* Animated gradient for circular progress */
+    .circle-fg {
+        transition: stroke-dashoffset 350ms cubic-bezier(.22,1,.36,1), stroke 1s linear;
+        /* animate stroke gradient rotation using filter/transform not widely supported; fall back to static gradient */
+    }
+
+    /* Optional keyframe to slightly rotate the SVG for visual motion */
+    .circular {
+        animation: rotate-slow 6s linear infinite;
+    }
+
+    @keyframes rotate-slow {
+        from { transform: rotate(-90deg) rotate(0deg); }
+        to   { transform: rotate(-90deg) rotate(360deg); }
+    }
+
 
 /* ======================================================================== *\
     F O O T E R

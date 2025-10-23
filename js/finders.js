@@ -717,12 +717,16 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
       loaded++;
       updatePercent();
       // update visual progress fill and ARIA
-      const fill = document.getElementById('progress-fill');
       const pctEl = document.getElementById('loading-percentage');
-      const progressBar = document.querySelector('.progress-bar');
+      const circle = document.getElementById('circle-fg');
       const pct = Math.round((loaded / total) * 100);
-      if (fill) fill.style.width = pct + '%';
       if (pctEl) pctEl.innerText = pct + '%';
+      if (circle) {
+        const circumference = 2 * Math.PI * 45; // r=45
+        const offset = Math.round(circumference - (pct / 100) * circumference);
+        circle.style.strokeDashoffset = offset;
+      }
+      const progressBar = document.querySelector('.circular-wrap');
       if (progressBar) progressBar.setAttribute('aria-valuenow', pct);
     };
     img.src = src;
