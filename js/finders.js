@@ -649,23 +649,39 @@ const convertNumberTo3DigitString = (number) => {
       A KÉPEK BETÖLTÉSÉNEK KEZELÉSE
 \*  ========================================================================  */
 
-const whenAllImagesLoaded = (onAllImagesLoaded, loadTime = 0) => {
-  const imageArray = Object.values(images);
-  const imageCount = imageArray.length;
-  const loadedImages = imageArray.filter(image => image.complete).length;
-
-  if (loadedImages < imageCount && loadTime < 10000) {
-    console.log(`Waiting for images to load... (${loadedImages}/${imageCount})`);
-    setTimeout(() => whenAllImagesLoaded(onAllImagesLoaded, loadTime + 100), 100);
-  } else if (loadTime >= 10000) {
-    console.error('Images could not be loaded within the timeout period.');
-  } else {
-    console.log('All images loaded successfully.');
-    onAllImagesLoaded();
+// Ez a függvény megvárja, amíg az összes kép betöltődik, és csak utána hívja meg a paraméterként kapott másik függvényt.
+// Az első paraméter a meghívandó függvény, a második paraméter a betöltési idő, ami 0-ról indul.
+function whenAllImagesLoaded(onAllImagesLoaded, loadTime = 0) {
+  const imageCount = Object.values(images).length; // az összes kép száma
+  let loadedImages = 0; // azoknak a képeknek a száma, amik már betöltődtek
+  
+  for (let image of Object.values(images)) { // végigmegyünk az összes képen
+    if (image.complete) { // ha a kép betöltődött
+      loadedImages++; // növeljük a betöltött képek számát
+    }
   }
-};
 
-window.onload = loadDefaultGame;
+  // ha még nem töltődött be minden kép, és még nem telt el 3 másodperc
+  if (loadedImages < imageCount && loadTime < 3000) { 
+    console.log('Waiting for images to load'); // kiírjuk, hogy várunk a képekre
+    setTimeout(() => { // 100ms múlva újra meghívjuk ezt a függvényt
+      whenAllImagesLoaded(onAllImagesLoaded, loadTime + 100); // a betöltési időt 100ms-al növeljük
+    }, 100);
+  }
+  if (loadTime >= 3000) { // ha már eltelt 3 másodperc
+    console.log('Images could not be loaded'); // kiírjuk, hogy nem sikerült betölteni a képeket
+    onAllImagesLoaded(); // de ettől még elindítjuk a játékot
+  } else if (imageCount === loadedImages) { // különben ha minden kép betöltődött
+    onAllImagesLoaded(); // meghívjuk a paraméterként kapott függvényt
+  }
+}
+
+// Az oldal betöltésekor először megvárjuk, hogy az összes kép betöltődjön
+window.addEventListener('DOMContentLoaded', () => {
+  whenAllImagesLoaded(() => {
+    loadDefaultGame(); // csak akkor indítjuk el a játékot, ha minden kép betöltődött
+  });
+});
 
 /* ======================================================================== *\
    E N D   O F   F I N D E R S . J S
