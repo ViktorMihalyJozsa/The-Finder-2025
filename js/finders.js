@@ -2,32 +2,48 @@
 
     F I N D E R S . J S
 
-    Ez a fájl tartalmazza a kereső játék logikáját és funkcióit.
+    A finders.js fájl tartalmazza a kereső játék logikáját és funkcióit.
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    A kereső játék használata és szabályai:
+    A fájl tartalmazza a következő funkciókat:
 
-    ~ A játék egy rácsos játéktáblán játszódik, amely különböző méretű lehet a
-        nehézségi szinttől függően (könnyű, közepes, nehéz).
-    ~ A játékos célja, hogy felfedezze az összes mezőt anélkül, hogy egy célpontra
-        kattintana.
-    ~ A célpontok véletlenszerűen helyezkednek el a táblán, és a játékosnak
-        meg kell jelölnie őket zászlókkal.
-    ~ A játékos bal kattintással fedezhet fel mezőket, jobb kattintással pedig
-        jelölheti meg a célpontokat.
-    ~ A játék akkor ér véget, ha a játékos felfedez egy célpontot (veszít),
-        vagy ha minden mezőt felfedezett és minden célpontot helyesen jelölt
-        meg (nyer).
-    ~ Az időzítő méri a játékidőt, és a játékos a lehető leggyorsabban
-        próbálhatja megoldani a táblát.
-    ~ A játék újraindítható a fő gomb megnyomásával, és a nehézségi szint
-        kiválasztható a legördülő menüből.
+        - DOM elemek - Játék tábla és vezérlő panelek
+        - DOM elemek - Időzítő és jelölő gombok
+        - Nehézségi beállítások
+        - Mezők és játék állapotok
+        - Játék kezdete
+        - Játék újraindítása
+        - Nehézségi beállítások változtatása
+        - Mezők megjelenítése a játéktáblán
+        - Nehézségi szint választás
+        - Bal kattintás események
+        - Jobb kattintás események
+        - Mezők kattintás események
+        - Mezők érvényessége
+        - Játék vége ellenőrzése
+        - Nyertes játék
+        - Vesztes játék
+        - Action-gomb állapotának frissítése
+        - Célpontok megjelölve
+        - Időzítő kezelése
+        - Megtalált cél megjelenítése
+        - Jelöletlen célok megjelenítése
+        - Hibás jelölések megjelenítése
+        - Feldezetlen mezők felfedezése
+        - Számított mezőértékek
+        - Számolja a mezők körül a célokat
+        - Számolja meg a mezőket, amelyeket a játékos jelölt meg
+        - Keresse meg a szomszédos mezőket
+        - Helyezze el a célokat a térképen
+        - Térkép és boolean mappa funkciók készítése
+        - A számok konvertálása képes formátumba
+        - A képek betöltésének kezelése
     
 \*  ========================================================================  */
 
 /*  ========================================================================  *\
-     DOM ELEMEK - JÁTÉK TÁBLA ÉS VEZÉRLŐ PANELEK
+      DOM ELEMEK - JÁTÉK TÁBLA ÉS VEZÉRLŐ PANELEK
 \*  ========================================================================  */
 
 const bodyWidth = document.body.clientWidth;

@@ -6,22 +6,16 @@
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        A fájl tartalmazza a következő funkciókat:
+    A fájl tartalmazza a következő funkciókat:
 
-            1. checkOrientation() 
-                - Az oldal orientációjának ellenőrzése
-            2. window.addEventListener("resize") 
-                - Az oldal átméretezésének figyelése
-            3. window.addEventListener("orientationchange") 
-                - Az oldal orientációjának figyelése
-
-        A fájlhoz tartozó CSS:
-            - layout.css
-            - components.css
+        - Inicializálás és eseménykezelők beállítása
+        - Orientáció ellenőrzése és figyelmeztetés megjelenítése
 
 \*  ========================================================================  */
 
-
+/*  ========================================================================  *\
+      Inicializálás és eseménykezelők beállítása
+\*  ========================================================================  */
 document.addEventListener("DOMContentLoaded", () => {
     checkOrientation();
 
@@ -33,6 +27,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("orientationchange", checkOrientation);
 });
+
+
+/*  ========================================================================  *\
+      Orientáció ellenőrzése és figyelmeztetés kezelése
+\*  ========================================================================  */
 
 function checkOrientation() {
     const warning = document.getElementById("warning");

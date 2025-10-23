@@ -6,18 +6,15 @@
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        A fájl tartalma:
-            - Eseménykezelők hozzáadása a kattintáshoz
-            - Az oldal tartalmának betöltése
-            - Animáció beállítása
+    A fájl tartalmazza a következő funkciókat:
 
-        A fájlhoz tartozó CSS:
-            - layout.css
-            - components.css
+        - Lenyíló menü megjelenítése és elrejtése kattintásra
+        - AJAX segítségével betölti a menü tartalmát
 
-        A fájlhoz tartozó HTML:
-            - page/game-description-page.html
+\*  ========================================================================  */
 
+/*  ========================================================================  *\
+      Eseménykezelők és funkciók a lenyíló menühöz
 \*  ========================================================================  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -40,7 +37,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Itt töltöd be a tartalmat AJAX segítségével
+
+/*  ========================================================================  *\
+      AJAX kérés a dropdown tartalmának betöltéséhez
+\*  ========================================================================  */
+
     fetch('page/game-info-page.html') 
         .then(response => {
             if (!response.ok) { 
