@@ -724,12 +724,30 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
       if (circle) {
         const circumference = 2 * Math.PI * 45; // r=45
         const offset = Math.round(circumference - (pct / 100) * circumference);
+        // Debug log: show pct and offset
+        try {
+          console.debug('[loader] pct=', pct, 'offset=', offset);
+        } catch (e) {}
+
         // Use SVG attribute to avoid CSS unit issues in some browsers
         try {
           circle.setAttribute('stroke-dashoffset', String(offset));
         } catch (e) {
           // fallback to style if attribute fails
           circle.style.strokeDashoffset = offset;
+        }
+
+        // Debug: check if gradient is applied
+        try {
+          const computed = window.getComputedStyle(circle);
+          const strokeVal = computed.getPropertyValue('stroke');
+          console.debug('[loader] computed stroke:', strokeVal);
+          if (!strokeVal || strokeVal.indexOf('url(') === -1) {
+            // add fallback class to make it visible
+            circle.classList.add('fallback');
+          }
+        } catch (e) {
+          // ignore in older browsers
         }
       }
       const progressBar = document.querySelector('.circular-wrap');

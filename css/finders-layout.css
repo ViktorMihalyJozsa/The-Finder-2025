@@ -349,6 +349,14 @@ main {
     /* Fallback solid color if gradient is not available */
     .circle-fg.fallback { stroke: #4ade80; }
 
+/* ======= DEBUG HELPERS (temporary) ======= */
+/* Force the circular loader to be clearly visible during debugging */
+.circular { animation: none !important; }
+.circle-fg { stroke-width: 12 !important; stroke-linecap: round !important; }
+.circle-fg { filter: drop-shadow(0 0 6px rgba(0,0,0,0.6)); }
+.circular-wrap { outline: 2px dashed rgba(255,255,255,0.06); }
+/* End debug helpers */
+
     /* Animated gradient for circular progress */
     .circle-fg {
         transition: stroke-dashoffset 350ms cubic-bezier(.22,1,.36,1), stroke 1s linear;
