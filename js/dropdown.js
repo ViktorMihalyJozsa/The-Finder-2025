@@ -62,6 +62,22 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdownContent.style.opacity = 0; 
 });
 
+// Helper: load an HTML page fragment into a container (selector)
+function loadPageInto(containerSelector, pagePath) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return Promise.reject(new Error('Container not found for ' + containerSelector));
+
+    return fetch(pagePath)
+        .then(resp => {
+            if (!resp.ok) throw new Error('Failed to load ' + pagePath);
+            return resp.text();
+        })
+        .then(html => {
+            container.insertAdjacentHTML('afterbegin', html);
+            return container;
+        });
+}
+
 
 /*  ========================================================================  *\
     E N D   O F   D R O P D O W N . J S

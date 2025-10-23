@@ -279,6 +279,34 @@ main {
         aspect-ratio:  1 / 1;
     }
 
+    /* Loading overlay inside game container */
+    #loading-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        z-index: 1000;
+        gap: 8px;
+        padding: 1rem;
+    }
+
+    #loading-overlay h3 {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .loading-percentage {
+        font-family: monospace;
+        font-size: 1.2rem;
+        background: rgba(255,255,255,0.06);
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+    }
+
 
 /* ======================================================================== *\
     F O O T E R

@@ -667,36 +667,84 @@ const convertNumberTo3DigitString = (number) => {
 
 // Ez a függvény megvárja, amíg az összes kép betöltődik, és csak utána hívja meg a paraméterként kapott másik függvényt.
 // Az első paraméter a meghívandó függvény, a második paraméter a betöltési idő, ami 0-ról indul.
-function whenAllImagesLoaded(onAllImagesLoaded, loadTime = 0) {
-  const imageCount = Object.values(images).length; // az összes kép száma
-  let loadedImages = 0; // azoknak a képeknek a száma, amik már betöltődtek
-  
-  for (let image of Object.values(images)) { // végigmegyünk az összes képen
-    if (image.complete) { // ha a kép betöltődött
-      loadedImages++; // növeljük a betöltött képek számát
-    }
+// ---------- Image preloader with minimum display time (5s) ------------
+// List of game images to preload. Keep in sync with /images folder and CSS references.
+const imageFiles = [
+  'images/wooden-background.webp',
+  'images/logo.webp',
+  'images/button-start.webp',
+  'images/button-lost.webp',
+  'images/button-won.webp',
+  'images/counter.webp',
+  'images/0.webp','images/1.webp','images/2.webp','images/3.webp','images/4.webp','images/5.webp','images/6.webp','images/7.webp','images/8.webp',
+  'images/hidden.webp',
+  'images/target.webp',
+  'images/unmarked-target.webp',
+  'images/marker.webp',
+  'images/incorrect-marker.webp',
+  'images/favicon.webp'
+];
+
+function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
+  const total = imageFiles.length;
+  const percentEl = document.getElementById('loading-percentage');
+  const overlay = document.getElementById('loading-overlay');
+
+  const start = performance.now();
+  let loaded = 0;
+
+  function updatePercent() {
+    if (!percentEl) return;
+    const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
+    percentEl.innerText = `${pct}%`;
   }
 
-  // ha még nem töltődött be minden kép, és még nem telt el 3 másodperc
-  if (loadedImages < imageCount && loadTime < 3000) { 
-    console.log('Waiting for images to load'); // kiírjuk, hogy várunk a képekre
-    setTimeout(() => { // 100ms múlva újra meghívjuk ezt a függvényt
-      whenAllImagesLoaded(onAllImagesLoaded, loadTime + 100); // a betöltési időt 100ms-al növeljük
-    }, 100);
+  if (total === 0) {
+    // No images to load; still respect minimum display time
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, minDisplayMs - elapsed);
+    setTimeout(() => {
+      if (overlay) overlay.style.display = 'none';
+      onAllImagesLoaded();
+    }, wait);
+    return;
   }
-  if (loadTime >= 3000) { // ha már eltelt 3 másodperc
-    console.log('Images could not be loaded'); // kiírjuk, hogy nem sikerült betölteni a képeket
-    onAllImagesLoaded(); // de ettől még elindítjuk a játékot
-  } else if (imageCount === loadedImages) { // különben ha minden kép betöltődött
-    onAllImagesLoaded(); // meghívjuk a paraméterként kapott függvényt
-  }
+
+  // Load each image and count onload/onerror as 'loaded'
+  imageFiles.forEach(src => {
+    const img = new Image();
+    img.onload = img.onerror = () => {
+      loaded++;
+      updatePercent();
+    };
+    img.src = src;
+  });
+
+  // Poll until both conditions met: all images loaded AND minDisplayMs elapsed
+  const poll = setInterval(() => {
+    updatePercent();
+    const elapsed = performance.now() - start;
+    if (loaded >= total && elapsed >= minDisplayMs) {
+      clearInterval(poll);
+      if (overlay) overlay.style.display = 'none';
+      onAllImagesLoaded();
+    }
+  }, 100);
 }
 
-// Az oldal betöltésekor először megvárjuk, hogy az összes kép betöltődjön
-window.addEventListener('DOMContentLoaded', () => {
-  whenAllImagesLoaded(() => {
-    loadDefaultGame(); // csak akkor indítjuk el a játékot, ha minden kép betöltődött
-  });
+// Start preloader as soon as DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // If loadPageInto is available (from dropdown.js), use it to inject loading.html into #gameContainer
+  const startPreloader = () => whenAllImagesLoaded(() => loadDefaultGame(), 5000);
+
+  if (typeof loadPageInto === 'function') {
+    loadPageInto('#gameContainer', 'page/loading.html')
+      .then(() => startPreloader())
+      .catch(() => startPreloader());
+  } else {
+    // fallback: start preloader immediately
+    startPreloader();
+  }
 });
 
 /* ======================================================================== *\
