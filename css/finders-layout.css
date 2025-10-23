@@ -283,20 +283,28 @@ main {
     #loading-overlay {
         position: absolute;
         inset: 0;
+
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: rgb(32, 0, 0, 0.25);
-        color: #fff;
+        gap: 1rem;
+
+        background-color:  rgba(0, 0, 0, 0.5);
         z-index: 1000;
-        gap: 8px;
-        padding: 1rem;
     }
 
     #loading-overlay h3 {
-        margin: 0;
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 2rem;
+        color: beige;
+    }
+
+    #loading-overlay p {
+        text-align: center;
         font-size: 1.4rem;
+        color: beige;
     }
 
     .progress-bar {
@@ -323,7 +331,7 @@ main {
         top: 50%;
         transform: translate(-50%,-50%);
         font-family: monospace;
-        color: #fff;
+        color: rgb(255, 255, 255);
         font-weight: 600;
         pointer-events: none;
     }
