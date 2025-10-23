@@ -665,10 +665,7 @@ const convertNumberTo3DigitString = (number) => {
       A KÉPEK BETÖLTÉSÉNEK KEZELÉSE
 \*  ========================================================================  */
 
-// Ez a függvény megvárja, amíg az összes kép betöltődik, és csak utána hívja meg a paraméterként kapott másik függvényt.
-// Az első paraméter a meghívandó függvény, a második paraméter a betöltési idő, ami 0-ról indul.
-// ---------- Image preloader with minimum display time (5s) ------------
-// List of game images to preload. Keep in sync with /images folder and CSS references.
+// A betöltendő képek listája
 const imageFiles = [
   'images/wooden-background.webp',
   'images/logo.webp',
@@ -685,6 +682,7 @@ const imageFiles = [
   'images/favicon.webp'
 ];
 
+// Betölti az összes képet, és meghívja a visszahívást, amikor minden kép betöltődött
 function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
   const total = imageFiles.length;
   const percentEl = document.getElementById('loading-percentage');
@@ -693,6 +691,7 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
   const start = performance.now();
   let loaded = 0;
 
+  // Frissíti a százalékos kijelzőt
   function updatePercent() {
     if (!percentEl) return;
     const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
@@ -700,7 +699,7 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
   }
 
   if (total === 0) {
-    // No images to load; still respect minimum display time
+    // Nincs betöltendő kép, azonnal hívja meg a visszahívást a minimális megjelenítési idő után
     const elapsed = performance.now() - start;
     const wait = Math.max(0, minDisplayMs - elapsed);
     setTimeout(() => {
@@ -710,13 +709,17 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
     return;
   }
 
-  // Load each image and count onload/onerror as 'loaded'
+  
+  /*  ========================================================================  *\
+      KÉPEK BETÖLTÉSE
+  \*  ========================================================================  */
+
   imageFiles.forEach(src => {
     const img = new Image();
     img.onload = img.onerror = () => {
       loaded++;
       updatePercent();
-      // update visual progress fill and ARIA
+      // Frissítse a kör alapú betöltési sávot
       const pctEl = document.getElementById('loading-percentage');
       const circle = document.getElementById('circle-fg');
       const pct = Math.round((loaded / total) * 100);
@@ -724,30 +727,30 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
       if (circle) {
         const circumference = 2 * Math.PI * 45; // r=45
         const offset = Math.round(circumference - (pct / 100) * circumference);
-        // Debug log: show pct and offset
+        // Debug: ellenőrizze a számított értékeket
         try {
           console.debug('[loader] pct=', pct, 'offset=', offset);
         } catch (e) {}
 
-        // Use SVG attribute to avoid CSS unit issues in some browsers
+        // Az offset beállítása a stroke-dashoffset tulajdonságon keresztül
         try {
           circle.setAttribute('stroke-dashoffset', String(offset));
         } catch (e) {
-          // fallback to style if attribute fails
+          // tartalékos megoldás régebbi böngészők számára
           circle.style.strokeDashoffset = offset;
         }
 
-        // Debug: check if gradient is applied
+        // Debug: ellenőrizze a számított stílust
         try {
           const computed = window.getComputedStyle(circle);
           const strokeVal = computed.getPropertyValue('stroke');
           console.debug('[loader] computed stroke:', strokeVal);
           if (!strokeVal || strokeVal.indexOf('url(') === -1) {
-            // add fallback class to make it visible
+            // Ha a stroke nem megfelelően van alkalmazva, alkalmazzon egy tartalék osztályt
             circle.classList.add('fallback');
           }
         } catch (e) {
-          // ignore in older browsers
+          // Nem sikerült lekérdezni a számított stílust
         }
       }
       const progressBar = document.querySelector('.circular-wrap');
@@ -756,7 +759,11 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
     img.src = src;
   });
 
-  // Poll until both conditions met: all images loaded AND minDisplayMs elapsed
+
+/*  ========================================================================  *\
+      POLLOLÁS AZ ÖSSZES KÉP BETÖLTŐDÉSÉHEZ
+\*  ========================================================================  */
+
   const poll = setInterval(() => {
     updatePercent();
     const elapsed = performance.now() - start;
@@ -768,9 +775,13 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
   }, 100);
 }
 
-// Start preloader as soon as DOM is ready
+
+/*  ========================================================================  *\
+      DOM CONTENT LOADED ESEMÉNY KEZELÉSE
+\*  ========================================================================  */
+
 document.addEventListener('DOMContentLoaded', () => {
-  // If loadPageInto is available (from dropdown.js), use it to inject loading.html into #gameContainer
+  // Indítsa el a preloader-t, és töltse be az alapértelmezett játékot
   const startPreloader = () => whenAllImagesLoaded(() => loadDefaultGame(), 5000);
 
   if (typeof loadPageInto === 'function') {
@@ -778,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => startPreloader())
       .catch(() => startPreloader());
   } else {
-    // fallback: start preloader immediately
+    // Ha a loadPageInto nincs definiálva, csak indítsa el a preloader-t
     startPreloader();
   }
 });
