@@ -18,10 +18,8 @@
                 3.1.4 D R O P D O W N - C O N T E N T
                 3.1.5 G A M E - P A G E
             3.2 G A M E - C O N T A I N E R
+                3.2.1 L O A D I N G   O V E R L A Y
         4. F O O T E R
-
-    A fájl tartalmazza a játék elrendezéséhez szükséges stílusokat.
-    A stílusok a játék megjelenését és elrendezését befolyásolják.
 
 \* ======================================================================== */
 
@@ -262,120 +260,124 @@ main {
         }
 
 
-/* ======================================================================== *\
-    L O A D I N G   O V E R L A Y   &   G A M E  C O N T A I N E R
-\* ======================================================================== */
+    /* ======================================================================== *\
+        G A M E - C O N T A I N E R
+    \* ======================================================================== */
 
-/* Game container */
-#gameContainer {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 30vw;
-    max-width: 600px;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    aspect-ratio: 1 / 1;
-}
+    #gameContainer {
+        position:      relative;
+        top:           0;
+        left:          0;
+        width:         30vw;
+        max-width:     600px;
+        height:        auto;
+        margin:        0;
+        padding:       0;
+        aspect-ratio:  1 / 1;
+    }
 
-/* Loading overlay inside game container */
-#loading-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    z-index: 1000;
-}
 
-#loading-overlay h3 {
-    text-transform: uppercase;
-    text-align: center;
-    font-size: 2rem;
-    color: beige;
-}
+        /* ======================================================================== *\
+            L O A D I N G   O V E R L A Y
+        \* ======================================================================== */
 
-#loading-overlay p {
-    text-align: center;
-    font-size: 1.4rem;
-    color: beige;
-}
+        /* A teljes képernyős átfedés a töltésjelzőhöz */
+        #loading-overlay {
+            position:         absolute;
+            inset:            0;
 
-/* Progress bar (linear, optional) */
-.progress-bar {
-    position: relative;
-    width: 70%;
-    max-width: 420px;
-    height: 18px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 0.8rem;
-}
+            display:          flex;
+            flex-direction:   column;
+            justify-content:  center;
+            align-items:      center;
+            gap:              1rem;
 
-.progress-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #ff9f0a, #ff7f00);
-    transition: width 300ms ease-out;
-}
+            z-index:          1000;
+        }
 
-/* ================= ULTRA NEON CYBERPUNK CIRCULAR SPINNER ================= */
+            #loading-title h3 {
+                text-transform:  uppercase;
+                text-align:      center;
 
-.circular-wrap {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+                font-size:       2rem;
+                color:           beige;
+            }
 
-/* Halo-style dynamic circle with transparent center */
-.circular {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    position: relative;
+            #loading-sub p {
+                text-align:  center;
 
-    /* Neon halo ív, belül átlátszó középponttal */
-    background: radial-gradient(circle, rgba(0, 0, 0, 0) 100%, rgba(0, 0, 0, 0) 100%),  /* Átlátszó középpont */
-                conic-gradient(  /* Neon színátmenet körben */
-                    rgba(255, 159, 10, 0) 0deg,
-                    rgba(255, 159, 10, 0.2) 180deg,
-                    rgba(255, 159, 10, 0.5) 240deg,
-                    rgba(255, 159, 10, 0.8) 300deg,
-                    rgba(255, 159, 10, 1) 360deg
-                );
+                font-size:   1.4rem;
+                color:       beige;
+            }
 
-    box-shadow: 0 0 20px rgba(255, 159, 10, 0.7), 0 0 40px rgba(255, 159, 10, 0.5);
-    overflow: hidden;
+        /* A kör alakú töltésjelző konténer */
+        .circular-wrap {
+            position:         relative;
 
-    /* Forgás animáció */
-    animation: rotate-ring 2s linear infinite;
-}
+            display:          flex;
+            align-items:      center;
+            justify-content:  center;
 
-/* Forgás animáció kulcskockák */
-@keyframes rotate-ring {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+            width:            10rem;
+            height:           10rem;
+        }
 
-/* ================= Középen a százalék ================= */
-.progress-percent {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 2rem;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
-    pointer-events: none;
-}
+        /* A narancssárga fénykör */
+        .circular {
+            position:        absolute;
+            pointer-events:  none;
+
+            width:           100%;
+            height:          100%;
+            border-radius:   50%;
+        
+            background:      conic-gradient(
+                            rgba(255, 159, 10, 0) 0deg,
+                            rgba(255, 159, 10, 0.2) 180deg,
+                            rgba(255, 159, 10, 0.5) 240deg,
+                            rgba(255, 159, 10, 0.8) 300deg,
+                            rgba(255, 159, 10, 1) 360deg
+            );
+            box-shadow:      0 0 30px rgba(255, 159, 10, 0.7),
+                            0 0 60px rgba(255, 159, 10, 0.4);
+            animation:       rotate-ring 2s linear infinite;
+        }
+
+        /* A félig áttetsző üveg-hatású középső rész */
+        .progress-percent-wrap {
+            position:         absolute;
+
+            display:          flex;
+            align-items:      center;
+            justify-content:  center;
+
+            width:            80%;
+            height:           80%;
+
+            background:       rgba(0, 0, 0, 0.25);
+            backdrop-filter:  blur(3px);
+
+            border:           1px solid rgba(255, 255, 255, 0.1);
+            border-radius:    50%;
+
+            z-index:           2;
+        }
+
+        /* A százalék szöveg */
+        .progress-percent {
+            pointer-events:  none;
+
+            font-size:       2rem;
+            font-weight:     700;
+            color:           rgb(255, 255, 255, 0.9);
+            text-shadow:     0 0 0.5rem rgba(255, 255, 255, 0.9);
+        }
+
+        /* Forgaló animáció */
+        @keyframes rotate-ring {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
 
 /* ======================================================================== *\
