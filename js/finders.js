@@ -8,393 +8,221 @@
 
     A fájl tartalmazza a következő funkciókat:
 
-        - DOM elemek - Játék tábla és vezérlő panelek
-        - DOM elemek - Időzítő és jelölő gombok
-        - Nehézségi beállítások
-        - Mezők és játék állapotok
+        - DOM elemek kiválasztása
+        - Nehézségi beállítások definiálása
+        - Mezők és játék állapotok kezelése
+        - Segédfunkciók
+        - Térkép és boolean map létrehozása
+        - Mezők megjelenítése a játéktáblán
+        - Játék kezdetének méretezése
         - Játék kezdete
         - Játék újraindítása
         - Nehézségi beállítások változtatása
-        - Mezők megjelenítése a játéktáblán
-        - Nehézségi szint választás
-        - Bal kattintás események
-        - Jobb kattintás események
-        - Mezők kattintás események
-        - Mezők érvényessége
-        - Játék vége ellenőrzése
-        - Nyertes játék
-        - Vesztes játék
-        - Action-gomb állapotának frissítése
-        - Célpontok megjelölve
         - Időzítő kezelése
-        - Megtalált cél megjelenítése
-        - Jelöletlen célok megjelenítése
-        - Hibás jelölések megjelenítése
-        - Feldezetlen mezők felfedezése
+        - Célok elhelyezése a térképen
+        - Mezők keresése és számlálása
         - Számított mezőértékek
-        - Számolja a mezők körül a célokat
-        - Számolja meg a mezőket, amelyeket a játékos jelölt meg
-        - Keresse meg a szomszédos mezőket
-        - Helyezze el a célokat a térképen
-        - Térkép és boolean mappa funkciók készítése
-        - A számok konvertálása képes formátumba
-        - A képek betöltésének kezelése
-    
+        - Felfedezetlen mezők felfedezése
+        - Játék vége ellenőrzése
+        - Játék kimenetei
+        - Action-gomb állapotának frissítése
+        - Célok megjelölve
+        - Egér pozíció kiszámítása
+        - Kattintás eseménykezelők
+        - Mezők érvényessége
+        - Képek betöltésének kezelése
+        - DOM Content Loaded eseménykezelő
+
 \*  ========================================================================  */
 
 /*  ========================================================================  *\
-      DOM ELEMEK - JÁTÉK TÁBLA ÉS VEZÉRLŐ PANELEK
+      DOM ELEMEK KIVÁLASZTÁSA
 \*  ========================================================================  */
-
-const bodyWidth = document.body.clientWidth;
-const bodyHeight = document.body.clientHeight;
 
 const gameContainer = document.getElementById('gameContainer');
 const controlPanel = document.getElementById('control-panel');
-const controlPanelWidth = controlPanel.offsetWidth;
-
-
-/*  ========================================================================  *\
-      DOM ELEMEK - IDŐZÍTŐ ÉS JELÖLŐ GOMBOK
-\*  ========================================================================  */
-
 const actionButton = document.getElementById('main-action-button');
 const markerCounter = document.getElementById('marker-counter');
 const timeCounter = document.getElementById('time-counter');
+const levelSelector = document.getElementById('level-selector');
 
 
 /*  ========================================================================  *\
-      NEHÉZSÉGI BEÁLLÍTÁSOK
+      NEHÉZSÉGI BEÁLLÍTÁSOK DEFINIÁLÁSA
 \*  ========================================================================  */
 
+/*
+    Minden nehézségi szinthez definiáljuk:
+        - sorok és oszlopok számát
+        - teljes célpontszámot
+        - mezőméret számításhoz használt divisor
+        - célpontok értékének minimumát és maximumát
+*/
 const difficultySettings = {
-  easy: {size: controlPanelWidth / 8, columns: 8, rows: 8, targetCount: 8},
-  medium: {size: controlPanelWidth / 10, columns: 10, rows: 10, targetCount: 12},
-  hard: {size: controlPanelWidth / 12, columns: 12, rows: 12, targetCount: 16}
+    easy:   { columns: 8,  rows: 8,  targetCount: 10, divisor: 8,  minTargetValue: 1, maxTargetValue: 3 },
+    medium: { columns: 10, rows: 10, targetCount: 20, divisor: 10, minTargetValue: 1, maxTargetValue: 5 },
+    hard:   { columns: 12, rows: 12, targetCount: 30, divisor: 12, minTargetValue: 1, maxTargetValue: 8 }
 };
 
 
 /*  ========================================================================  *\
-      MEZŐK ÉS JÁTÉK ÁLLAPOTOK
+      MEZŐK ÉS JÁTÉK ÁLLAPOTOK KEZELÉSE
 \*  ========================================================================  */
 
-let size;              // A mezők mérete
-let columns;           // A mezők oszlopainak száma
-let rows;              // A mezők sorainak száma
-let targetCount;       // A célpontok száma
-
-let isGameOver;        // A játék véget ért-e
-let isFirstClick;      // Az első kattintás megtörtént-e
-let exploredFields;    // Felfedezett mezők száma
-let markerMap;         // Jelölt mezők térképe
-let map;               // Játéktábla térképe
-let exploredMap;       // Felfedezett mezők térképe
-let remainingTargets;  // Megmaradt célpontok száma
-let timer;             // Időzítő az időméréshez
-let seconds = 0;       // Az eltelt másodpercek száma
+let size, columns, rows, targetCount;
+let isGameOver = false;
+let isFirstClick = true;
+let exploredFields = 0;
+let markerMap = [];
+let map = [];
+let exploredMap = [];
+let remainingTargets = 0;
+let timer = null;
+let seconds = 0;
 
 
 /*  ========================================================================  *\
+      SEGÉDFUNKCIÓK
+\*  ========================================================================  */
+
+/* — Biztonságos vezérlőpanel szélesség kiszámítás — */
+function safeControlPanelWidth() {
+    const w = controlPanel && controlPanel.offsetWidth ? controlPanel.offsetWidth : Math.min(window.innerWidth, 600);
+    return w;
+}
+
+/* — Mezőméret kiszámítása az aktuális ablak / panel szélesség alapján — */
+function computeSizeFor(difficulty) {
+    const div = difficultySettings[difficulty].divisor || 10;
+    return Math.max(20, Math.floor(safeControlPanelWidth() / div)); // min. 20px
+}
+
+/* — Szám konvertálása 3 karakter hosszú sztringgé — */
+const convertNumberTo3DigitString = (number) => {
+    return number < 0 ? '🤡' : number.toString().padStart(3, '0');
+};
+
+
+/*  ========================================================================  *\
+      TÉRKÉP ÉS BOOLEAN MAP LÉTREHOZÁSA
+\*  ========================================================================  */
+
+const createMap = () => Array.from({ length: rows }, () => Array(columns).fill(0));
+const createBooleanMap = () => Array.from({ length: rows }, () => Array(columns).fill(false));
+
+
+/*  ========================================================================  *\
+      MEZŐK MEGJELENÍTÉSE A JÁTÉKTÁBLÁN
+\*  ========================================================================  */
+
+/* — Egy mező kirajzolása a játéktáblára — */
+function drawField(row, col, className) {
+    const field = document.createElement('div');
+    field.className = `field ${className}`;
+    field.dataset.row = row;
+    field.dataset.col = col;
+    field.style.position = 'absolute';
+    field.style.left = `${col * size}px`;
+    field.style.top = `${row * size}px`;
+    field.style.width = `${size}px`;
+    field.style.height = `${size}px`;
+    gameContainer.appendChild(field);
+}
+
+/* — Térkép kirajzolása (teljes frissítés) — */
+const drawMap = () => {
+    if (!gameContainer) return;
+    gameContainer.innerHTML = '';
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const isExplored = exploredMap[r][c];
+            const isMarked = markerMap[r][c];
+            const field = map[r][c];
+
+            if (!isExplored) {
+                drawField(r, c, isMarked ? 'marker' : 'hidden');
+            } else if (field && field.type === 'target') {
+                drawField(r, c, 'target');
+            } else if (field === 0) {
+                drawField(r, c, 'number-0');
+            } else {
+                drawField(r, c, `number-${field}`);
+            }
+        }
+    }
+};
+
+
+/*  ========================================================================  *\
+      JÁTÉK KEZDETÉNEK MÉRETEZÉSE
+\*  ========================================================================  */
+
+function applyContainerSize() {
+    if (!gameContainer) return;
+    gameContainer.style.setProperty('--field-size', `${size}px`);
+    gameContainer.style.width = `${columns * size}px`;
+    gameContainer.style.height = `${rows * size}px`;
+}
+
+
+/*  ========================================================================  *\  
       JÁTÉK KEZDETE
 \*  ========================================================================  */
 
 function initGame() {
-  isGameOver = false;
-  isFirstClick = true;
-  exploredFields = 0;
-  map = createMap();
-  exploredMap = createBooleanMap();
-  markerMap = createBooleanMap();
+    isGameOver = false;
+    isFirstClick = true;
+    exploredFields = 0;
+    map = createMap();
+    exploredMap = createBooleanMap();
+    markerMap = createBooleanMap();
 
-  // Gomb osztályának visszaállítása
-  actionButton.className = ''; // Töröljük az összes osztályt
-  actionButton.classList.add('button-start');
+    updateActionButton('start');
+    remainingTargets = targetCount;
+    markerCounter.innerText = convertNumberTo3DigitString(remainingTargets);
 
-  remainingTargets = targetCount;
-  markerCounter.innerText = convertNumberTo3DigitString(remainingTargets);
-
-  drawMap();
+    applyContainerSize();
+    drawMap();
 }
+
 
 /*  ========================================================================  *\
       JÁTÉK ÚJRAINDÍTÁSA
 \*  ========================================================================  */
 
 function loadDefaultGame() {
-  const settings = difficultySettings['easy'];
-  size = settings.size;
-  columns = settings.columns;
-  rows = settings.rows;
-  targetCount = settings.targetCount;
+    const settings = difficultySettings.easy;
+    columns = settings.columns;
+    rows = settings.rows;
+    targetCount = settings.targetCount;
+    size = computeSizeFor('easy');
 
-  gameContainer.style.width = `${columns * size}px`;
-  gameContainer.style.height = `${rows * size}px`;
-
-  // Gomb osztályának visszaállítása
-  actionButton.className = ''; // Töröljük az összes osztályt
-  actionButton.classList.add('button-start');
-
-  initGame();
+    applyContainerSize();
+    initGame();
 }
+
 
 /*  ========================================================================  *\
       NEHÉZSÉGI BEÁLLÍTÁSOK VÁLTOZTATÁSA
 \*  ========================================================================  */
 
 function setDifficulty(difficulty) {
-  stopTimer();
-  timeCounter.innerText = convertNumberTo3DigitString(0);
-
-  const settings = difficultySettings[difficulty];
-  size = settings.size;
-  columns = settings.columns;
-  rows = settings.rows;
-  targetCount = settings.targetCount;
-
-  gameContainer.style.width = `${columns * size}px`;
-  gameContainer.style.height = `${rows * size}px`;
-
-  initGame();
-}
-
-/*  ========================================================================  *\
-      MEZŐK MEGJELENÍTÉSE A JÁTÉKTÁBLÁN
-\*  ========================================================================  */
-
-function drawField(row, col, className) {
-  const field = document.createElement('div');
-  field.className = `field ${className}`;
-  field.style.left = `${col * size}px`;
-  field.style.top = `${row * size}px`;
-  gameContainer.appendChild(field);
-}
-
-// Példa a mezőméret dinamikus beállítására
-function setFieldSize() {
-  gameContainer.style.setProperty('--field-size', `${size}px`);
-}
-
-// Hívás a megfelelő helyen
-setFieldSize();
-
-
-/*  ========================================================================  *\
-      NEHÉZSÉGI SZINT VÁLASZTÁS
-\*  ========================================================================  */
-
-const levelSelector = document.getElementById('level-selector');
-if (levelSelector) {
-  levelSelector.addEventListener('change', function () {
-    const difficulty = this.value;
-    setDifficulty(difficulty);
-  });
-} 
-else {
-  console.error('Level selector element not found!');
-}
-
-if (actionButton) {
-  actionButton.addEventListener('click', function () {
-    if (levelSelector) {
-      const difficulty = levelSelector.value;
-      if (difficulty) {
-        setDifficulty(difficulty);
-        stopTimer();
-        timeCounter.innerText = convertNumberTo3DigitString(0);
-      } 
-      else {
-        alert('Please select a difficulty level before starting the game!');
-      }
+    if (!difficultySettings[difficulty]) {
+        console.warn('Ismeretlen nehézségi szint:', difficulty);
+        return;
     }
-  });
-} 
-else {
-  console.error('Action button element not found!');
-}
 
-
-/*  ========================================================================  *\
-      BAL KATTINTÁS ESEMÉNYEK
-\*  ========================================================================  */
-
-gameContainer.addEventListener('click', function (event) {
-  if (isGameOver) return;
-
-  const { row, col } = getMousePosition(event);
-  if (!isValidField(row, col)) return;
-
-  if (isFirstClick) {
-    placeTargets(map, targetCount, row, col);
-    calculateFieldValues(map);
-    isFirstClick = false;
-    startTimer();
-  }
-
-  exploreField(row, col);
-  drawMap();
-  checkGameEnd(row, col);
-});
-
-
-/*  ========================================================================  *\
-      JOBB KATTINTÁS ESEMÉNYEK
-\*  ========================================================================  */
-
-gameContainer.addEventListener('contextmenu', function (event) {
-  event.preventDefault();
-  if (isGameOver) return;
-
-  const { row, col } = getMousePosition(event);
-  if (!isValidField(row, col)) return;
-
-  if (exploredMap[row][col]) {
-    const neighbourCoordinates = findNeighbourFields(map, row, col);
-    let markedNeighbours = countMarkedNeighbours(neighbourCoordinates);
-    if (markedNeighbours === map[row][col]) {
-      for (let coordinate of neighbourCoordinates) {
-        exploreField(coordinate.row, coordinate.col);
-      }
-    }
-  } 
-  else {
-    markerMap[row][col] = !markerMap[row][col];
-    remainingTargets += markerMap[row][col] ? -1 : 1;
-    markerCounter.innerText = convertNumberTo3DigitString(remainingTargets);
-  }
-
-  drawMap();
-  checkGameEnd(row, col);
-  if (isGameOver) {
-    showWrongMarkers();
     stopTimer();
-  }
-});
+    resetTimerDisplay();
 
+    const settings = difficultySettings[difficulty];
+    columns = settings.columns;
+    rows = settings.rows;
+    targetCount = settings.targetCount;
+    size = computeSizeFor(difficulty);
 
-/*  ========================================================================  *\
-      MEZŐK KATTINTÁS ESEMÉNYEK
-\*  ========================================================================  */
-
-// Kiszámítja az egér pozícióját a tábla mezői alapján
-function getMousePosition(event) {
-  const rect = gameContainer.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
-
-  const col = Math.floor(x / size);
-  const row = Math.floor(y / size);
-
-  return { row, col };
-}
-
-
-/*  ========================================================================  *\
-      MEZŐK ÉRVÉNYESSÉGE
-\*  ========================================================================  */
-
-// Ellenőrzi, hogy a mező érvényes-e a játéktáblán
-function isValidField(row, col) {
-  return row >= 0 && row < rows && col >= 0 && col < columns;
-}
-
-
-/*  ========================================================================  *\
-      JÁTÉK VÉGE ELLENŐRZÉSE
-\*  ========================================================================  */
-
-function checkGameEnd(row, col) {
-  // Ellenőrizzük, hogy a játékos veszített-e
-  if (map[row][col] === 'target' && exploredMap[row][col]) {
-    loseGame();
-    return;
-  }
-
-  // Ellenőrizzük, hogy a játékos nyert-e
-  const allFieldsExplored = exploredFields === rows * columns - targetCount;
-  const allTargetsMarked = allTargetsMarkedCorrectly();
-
-  if (allFieldsExplored && allTargetsMarked) {
-    winGame();
-  }
-}
-
-/*  ========================================================================  *\
-      NYERTES JÁTÉK
-\*  ========================================================================  */
-
-function winGame() {
-  isGameOver = true;
-
-  // Gomb állapotának frissítése
-  updateActionButton('won');
-
-  // Időzítő leállítása
-  stopTimer();
-}
-
-/*  ========================================================================  *\
-      VESZTES JÁTÉK
-\*  ========================================================================  */
-
-function loseGame() {
-  isGameOver = true;
-
-  // Gomb állapotának frissítése
-  updateActionButton('lost');
-
-  // Felrobbant aknák megjelenítése
- revealExploredTarget();
-
-  // Hibás jelölések és meg nem talált aknák megjelenítése
-  showWrongMarkers();
-  showUnmarkedTargets();
-
-  // Időzítő leállítása
-  stopTimer();
-}
-
-
-/*  ========================================================================  *\
-      ACTION-GOMB ÁLLAPOTÁNAK FRISSÍTÉSE
-\*  ========================================================================  */
-
-// Frissíti a gomb állapotát a játék állapota alapján
-function updateActionButton(state) {
-  actionButton.className = ''; // Töröljük az összes osztályt
-  if (state === 'start') {
-    actionButton.classList.add('button-start');
-  } 
-  else if (state === 'won') {
-    actionButton.classList.add('button-won');
-  } 
-  else if (state === 'lost') {
-    actionButton.classList.add('button-lost');
-  }
-}
-
-
-/*  ========================================================================  *\
-      CÉLPONTOK MEGJELÖLVE
-\*  ========================================================================  */
-
-function allTargetsMarkedCorrectly() {
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const isTarget = map[row][col] === 'target';
-      const isMarked = markerMap[row][col];
-
-      // Ha egy célpont nincs megjelölve
-      if (isTarget && !isMarked) {
-        return false;
-      }
-
-      // Ha egy nem célpont tévesen meg van jelölve
-      if (!isTarget && isMarked) {
-        return false;
-      }
-    }
-  }
-  return true; // Minden célpont helyesen meg van jelölve
+    applyContainerSize();
+    initGame();
 }
 
 
@@ -403,110 +231,73 @@ function allTargetsMarkedCorrectly() {
 \*  ========================================================================  */
 
 function startTimer() {
-  // Ellenőrizzük, hogy az időmérő már fut-e
-  if (timer) return;
-
-  // Indítjuk az időmérőt, maximum 960 másodpercig(16perc)
-  timer = setInterval(() => {
-    seconds = Math.min(seconds + 1, 960);
-    timeCounter.innerText = convertNumberTo3DigitString(seconds);
-  }, 1000);
+    if (timer) return;
+    timer = setInterval(() => {
+        seconds = Math.min(seconds + 1, 960);
+        timeCounter.innerText = convertNumberTo3DigitString(seconds);
+    }, 1000);
 }
 
 function stopTimer() {
-  // Leállítjuk az időmérőt
-  clearInterval(timer);
-  timer = null; // Időzítő nullázása
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
 }
 
 function resetTimer() {
-  // Nullázzuk az időmérőt
-  stopTimer();
-  seconds = 0;
-  timeCounter.innerText = convertNumberTo3DigitString(seconds);
+    stopTimer();
+    seconds = 0;
+    timeCounter.innerText = convertNumberTo3DigitString(seconds);
+}
+
+function resetTimerDisplay() {
+    timeCounter.innerText = convertNumberTo3DigitString(0);
 }
 
 
 /*  ========================================================================  *\
-      MEGTALÁLT CÉL MEGJELENÍTÉSE
+      CÉLOK ELHELYEZÉSE A TÉRKÉPEN
 \*  ========================================================================  */
 
-function revealExploredTarget() {
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      if (map[row][col] === 'target' && exploredMap[row][col]) {
-        drawField(row, col, 'target');
-      }
+const placeTargets = (mapRef, tCount, startRow, startCol) => {
+    const { minTargetValue, maxTargetValue } = difficultySettings[levelSelector.value || 'easy'];
+    let placed = 0;
+    while (placed < tCount) {
+        const x = Math.floor(Math.random() * columns);
+        const y = Math.floor(Math.random() * rows);
+        const already = mapRef[y][x] && mapRef[y][x].type === 'target';
+        const tooClose = Math.abs(x - startCol) <= 1 && Math.abs(y - startRow) <= 1;
+        if (!already && !tooClose) {
+            mapRef[y][x] = { type: 'target', value: Math.floor(Math.random() * (maxTargetValue - minTargetValue + 1)) + minTargetValue };
+            placed++;
+        }
     }
-  }
-}
+};
 
 
 /*  ========================================================================  *\
-      JELÖLETLEN CÉLOK MEGJELENÍTÉSE
+      MEZŐK KERESÉSE ÉS SZÁMLÁLÁSA
 \*  ========================================================================  */
 
-function showUnmarkedTargets() {
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const isTarget = map[row][col] === 'target';
-      const isNotMarked = !markerMap[row][col];
-      const isNotExplored = !exploredMap[row][col];
-
-      if (isTarget && isNotMarked && isNotExplored) {
-        drawField(row, col, 'unmarked-target'); // Meg nem talált akna
-      }
+const findNeighbourFields = (mapRef, rowI, colI) => {
+    const coords = [];
+    for (let r = rowI - 1; r <= rowI + 1; r++) {
+        for (let c = colI - 1; c <= colI + 1; c++) {
+            const within = r >= 0 && r < rows && c >= 0 && c < columns;
+            const notSelf = r !== rowI || c !== colI;
+            if (within && notSelf) coords.push({ row: r, col: c });
+        }
     }
-  }
+    return coords;
+};
+
+function countTargets(mapRef, neighbours) {
+    return neighbours.reduce((acc, { row, col }) => acc + ((mapRef[row][col] && mapRef[row][col].type === 'target') ? 1 : 0), 0);
 }
 
-/*  ========================================================================  *\
-      HIBÁS JELÖLÉSEK MEGJELENÍTÉSE
-\*  ========================================================================  */
-
-function showWrongMarkers() {
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const isMarked = markerMap[row][col];
-      const isNotTarget = map[row][col] !== 'target';
-
-      if (isMarked && isNotTarget) {
-        drawField(row, col, 'incorrect-marker'); // Hibás jelölés
-      }
-    }
-  }
-}
-
-
-/*  ========================================================================  *\
-      FELDEZETLEN MEZŐK FELFEDEZÉSE
-\*  ========================================================================  */
-
-function exploreField(row, col) {
-  // Ellenőrizzük, hogy a mező már felfedezett-e
-  const stack = [{ row, col }];
-
-  while (stack.length > 0) {
-    const { row, col } = stack.pop();
-
-    // Ellenőrizzük, hogy a mező érvényes-e
-    const isOutOfBounds = row < 0 || row >= map.length || col < 0 || col >= map[0].length;
-    if (isOutOfBounds) continue;
-
-    const isAlreadyExplored = exploredMap[row][col];
-    const isMarked = markerMap[row][col];
-    if (isAlreadyExplored || isMarked) continue;
-
-    // Jelöljük meg a mezőt felfedezettként
-    exploredFields++;
-    exploredMap[row][col] = true;
-
-    // Ha a mező üres (0), fedezzük fel a szomszédos mezőket
-    if (map[row][col] === 0) {
-      const neighbours = findNeighbourFields(map, row, col);
-      stack.push(...neighbours);
-    }
-  }
+function countMarkedNeighbours(coords) {
+    return coords.reduce((acc, { row, col }) => acc + (markerMap[row][col] ? 1 : 0), 0);
 }
 
 
@@ -514,271 +305,322 @@ function exploreField(row, col) {
       SZÁMÍTOTT MEZŐÉRTÉKEK
 \*  ========================================================================  */
 
-function calculateFieldValues(map) {
-  // Végigmegyünk minden mezőn, és megszámoljuk a szomszédos célpontokat
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const isTarget = map[row][col] === 'target';
-
-      // Csak akkor számolunk, ha a mező nem célpont
-      if (!isTarget) {
-        const neighbours = findNeighbourFields(map, row, col);
-        const targetCount = countTargets(map, neighbours);
-        map[row][col] = targetCount;
-      }
+function calculateFieldValues(mapRef) {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            if (!mapRef[r][c] || mapRef[r][c].type !== 'target') {
+                const neighbours = findNeighbourFields(mapRef, r, c);
+                const tc = countTargets(mapRef, neighbours);
+                mapRef[r][c] = tc;
+            }
+        }
     }
-  }
-}
-
-/*  ========================================================================  *\
-      SZÁMOLJA A MEZŐK KÖRÜL A CÉLOKAT
-\*  ========================================================================  */
-
-function countTargets(map, neighbours) {
-  // Visszatér a célpontok számával a megadott szomszédos koordinátákon
-  return neighbours.reduce((count, { row, col }) => {
-    return count + (map[row][col] === 'target' ? 1 : 0);
-  }, 0);
 }
 
 
 /*  ========================================================================  *\
-      SZÁMOLJA MEG A MEZŐKET, AMELYEKET A JÁTÉKOS JELÖLT MEG
+      FELFEDEZETLEN MEZŐK FELFEDEZÉSE
 \*  ========================================================================  */
 
-function countMarkedNeighbours(coordinates) {
-  // Megszámolja, hány mezőt jelölt meg a játékos a megadott szomszédok közül
-  return coordinates.reduce((count, { row, col }) => {
-    return count + (markerMap[row][col] ? 1 : 0);
-  }, 0);
+function exploreField(startR, startC) {
+    const stack = [{ row: startR, col: startC }];
+    while (stack.length > 0) {
+        const { row, col } = stack.pop();
+        if (row < 0 || row >= rows || col < 0 || col >= columns) continue;
+        if (exploredMap[row][col]) continue;
+        if (markerMap[row][col]) continue;
+
+        exploredMap[row][col] = true;
+        exploredFields++;
+
+        if (map[row][col] === 0) {
+            const neighbours = findNeighbourFields(map, row, col);
+            stack.push(...neighbours);
+        }
+    }
 }
 
-/*  ========================================================================  *\
-      KERESSE MEG A SZOMSZÉDOS MEZŐKET
-\*  ========================================================================  */
-
-const findNeighbourFields = (map, rowI, colI) => {
-  const neighbourCoordinates = [];
-  for (let row = rowI - 1; row <= rowI + 1; row++) {
-    for (let col = colI - 1; col <= colI + 1; col++) {
-      const isWithinBounds = row >= 0 && row < rows && col >= 0 && col < columns;
-      const isNotSelf = row !== rowI || col !== colI;
-
-      if (isWithinBounds && isNotSelf) {
-        neighbourCoordinates.push({ row, col });
-      }
-    }
-  }
-  return neighbourCoordinates;
-};
-
 
 /*  ========================================================================  *\
-      HELYEZZE EL A CÉLOKAT A TÉRKÉPEN
+      JÁTÉK VÉGE ELLENŐRZÉSE
 \*  ========================================================================  */
 
-const placeTargets = (map, targetCount, startRow, startCol) => {
-  let placedTargets = 0;
-
-  while (placedTargets < targetCount) {
-    const x = Math.floor(Math.random() * columns);
-    const y = Math.floor(Math.random() * rows);
-
-    const isAlreadyTarget = map[y][x] === 'target';
-    const isTooCloseToStart = Math.abs(x - startCol) <= 1 && Math.abs(y - startRow) <= 1;
-
-    if (!isAlreadyTarget && !isTooCloseToStart) {
-      map[y][x] = 'target';
-      placedTargets++;
+function allTargetsMarkedCorrectly() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const cell = map[r][c];
+            const isTarget = cell && cell.type === 'target';
+            const isMarked = markerMap[r][c];
+            if (isTarget && !isMarked) return false;
+            if (!isTarget && isMarked) return false;
+        }
     }
-  }
-};
-
-
-/*  ========================================================================  *\
-      TÉRKÉP ÉS BOOLEAN MAPPA FUNKCIOK KÉSZÍTÉSE
-\*  ========================================================================  */
-
-const createMap = () => Array.from({ length: rows }, () => Array(columns).fill(0));
-
-const createBooleanMap = () => Array.from({ length: rows }, () => Array(columns).fill(false));
-
-const drawMap = () => {
-  gameContainer.innerHTML = '';  // Töröljük a korábbi mezőket
-  for (let rowI = 0; rowI < rows; rowI++) {
-    for (let colI = 0; colI < columns; colI++) {
-      const isExplored = exploredMap[rowI][colI];
-      const isMarked = markerMap[rowI][colI];
-      const field = map[rowI][colI];
-
-      if (!isExplored) {                           // Felfedezetlen mező
-        drawField(rowI, colI, isMarked ? 'marker' : 'hidden');
-      } 
-      else if (field === 'target') {               // Célpont mező
-        drawField(rowI, colI, 'target');
-      } 
-      else if (field === 0) {
-        drawField(rowI, colI, 'number-0');         // Üres mező
-      } 
-      else {
-        drawField(rowI, colI, `number-${field}`);  // Számok
-      }
-    }
-  }
-};
-
-function drawField(row, col, className) {
-  const field = document.createElement('div');
-  field.className = `field ${className}`;
-  field.style.position = 'absolute';
-  field.style.left = `${col * size}px`;
-  field.style.top = `${row * size}px`;
-  field.style.width = `${size}px`;
-  field.style.height = `${size}px`;
-  gameContainer.appendChild(field);
+    return true;
 }
 
+function checkGameEnd(row, col) {
+    const cell = map[row][col];
+    if (cell && cell.type === 'target' && exploredMap[row][col]) {
+        loseGame();
+        return;
+    }
+
+    const allFieldsExplored = exploredFields === rows * columns - targetCount;
+    const allTargetsMarked = allTargetsMarkedCorrectly();
+
+    if (allFieldsExplored && allTargetsMarked) {
+        winGame();
+    }
+}
+
+
 /*  ========================================================================  *\
-      A SZÁMOK KONVERTÁLÁSA KÉPES FORMÁTUMBA
+      JÁTÉK KIMENETEI
 \*  ========================================================================  */
 
-const convertNumberTo3DigitString = (number) => {
-  return number < 0 ? '🤡' : number.toString().padStart(3, '0');
-};
+function winGame() {
+    isGameOver = true;
+    updateActionButton('won');
+    stopTimer();
+}
+
+function loseGame() {
+    isGameOver = true;
+    updateActionButton('lost');
+    revealExploredTarget();
+    showWrongMarkers();
+    showUnmarkedTargets();
+    stopTimer();
+}
+
 
 /*  ========================================================================  *\
-      A KÉPEK BETÖLTÉSÉNEK KEZELÉSE
+      ACTION-GOMB ÁLLAPOTÁNAK FRISSÍTÉSE
 \*  ========================================================================  */
 
-// A betöltendő képek listája
+function updateActionButton(state) {
+    actionButton.className = '';
+    if (state === 'start') actionButton.classList.add('button-start');
+    else if (state === 'won') actionButton.classList.add('button-won');
+    else if (state === 'lost') actionButton.classList.add('button-lost');
+}
+
+
+/*  ========================================================================  *\
+      CÉLOK MEGJELÖLVE
+\*  ========================================================================  */
+
+function revealExploredTarget() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const cell = map[r][c];
+            if (cell && cell.type === 'target' && exploredMap[r][c]) {
+                drawField(r, c, 'target');
+            }
+        }
+    }
+}
+
+function showUnmarkedTargets() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const cell = map[r][c];
+            if (cell && cell.type === 'target' && !markerMap[r][c] && !exploredMap[r][c]) {
+                drawField(r, c, 'unmarked-target');
+            }
+        }
+    }
+}
+
+function showWrongMarkers() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const cell = map[r][c];
+            if (markerMap[r][c] && (!cell || cell.type !== 'target')) {
+                drawField(r, c, 'incorrect-marker');
+            }
+        }
+    }
+}
+
+
+/*  ========================================================================  *\
+      EGÉR POZÍCIÓ KISZÁMÍTÁSA
+\*  ========================================================================  */
+
+function getMousePosition(event) {
+    const rect = gameContainer.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    return { row: Math.floor(y / size), col: Math.floor(x / size) };
+}
+
+
+/*  ========================================================================  *\
+      KATTINTÁS ESEMÉNYKEZELŐK
+\*  ========================================================================  */
+
+if (gameContainer) {
+    gameContainer.addEventListener('click', function (event) {
+        if (isGameOver) return;
+        const { row, col } = getMousePosition(event);
+        if (!isValidField(row, col)) return;
+
+        if (isFirstClick) {
+            placeTargets(map, targetCount, row, col);
+            calculateFieldValues(map);
+            isFirstClick = false;
+            startTimer();
+        }
+
+        exploreField(row, col);
+        drawMap();
+        checkGameEnd(row, col);
+    });
+
+    gameContainer.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        if (isGameOver) return;
+        const { row, col } = getMousePosition(event);
+        if (!isValidField(row, col)) return;
+
+        if (exploredMap[row][col]) {
+            const neighbours = findNeighbourFields(map, row, col);
+            const markedNeighbours = countMarkedNeighbours(neighbours);
+            if (markedNeighbours === map[row][col]) {
+                for (let coord of neighbours) exploreField(coord.row, coord.col);
+            }
+        } else {
+            markerMap[row][col] = !markerMap[row][col];
+            remainingTargets += markerMap[row][col] ? -1 : 1;
+            markerCounter.innerText = convertNumberTo3DigitString(remainingTargets);
+        }
+
+        drawMap();
+        checkGameEnd(row, col);
+        if (isGameOver) {
+            showWrongMarkers();
+            stopTimer();
+        }
+    });
+}
+
+
+/*  ========================================================================  *\
+      MEZŐK ÉRVÉNYESSÉGE
+\*  ========================================================================  */
+
+function isValidField(row, col) {
+    return typeof row === 'number' && typeof col === 'number' && row >= 0 && row < rows && col >= 0 && col < columns;
+}
+
+
+/*  ========================================================================  *\
+      KÉPEK BETÖLTÉSÉNEK KEZELÉSE
+\*  ========================================================================  */
+
 const imageFiles = [
-  'images/wooden-background.webp',
-  'images/logo.webp',
-  'images/button-start.webp',
-  'images/button-lost.webp',
-  'images/button-won.webp',
-  'images/counter.webp',
-  'images/0.webp','images/1.webp','images/2.webp','images/3.webp','images/4.webp','images/5.webp','images/6.webp','images/7.webp','images/8.webp',
-  'images/hidden.webp',
-  'images/target.webp',
-  'images/unmarked-target.webp',
-  'images/marker.webp',
-  'images/incorrect-marker.webp',
-  'images/favicon.webp'
+    'images/wooden-background.webp',
+    'images/logo.webp',
+    'images/button-start.webp',
+    'images/button-lost.webp',
+    'images/button-won.webp',
+    'images/counter.webp',
+    'images/0.webp','images/1.webp','images/2.webp','images/3.webp','images/4.webp','images/5.webp','images/6.webp','images/7.webp','images/8.webp',
+    'images/hidden.webp',
+    'images/target.webp',
+    'images/unmarked-target.webp',
+    'images/marker.webp',
+    'images/incorrect-marker.webp',
+    'images/favicon.webp'
 ];
 
-// Betölti az összes képet, és meghívja a visszahívást, amikor minden kép betöltődött
 function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
-  const total = imageFiles.length;
-  const percentEl = document.getElementById('loading-percentage');
-  const overlay = document.getElementById('loading-overlay');
+    const total = imageFiles.length;
+    const percentEl = document.getElementById('loading-percentage');
+    const overlay = document.getElementById('loading-overlay');
+    const start = performance.now();
+    let loaded = 0;
 
-  const start = performance.now();
-  let loaded = 0;
-
-  // Frissíti a százalékos kijelzőt
-  function updatePercent() {
-    if (!percentEl) return;
-    const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
-    percentEl.innerText = `${pct}%`;
-  }
-
-  if (total === 0) {
-    // Nincs betöltendő kép, azonnal hívja meg a visszahívást a minimális megjelenítési idő után
-    const elapsed = performance.now() - start;
-    const wait = Math.max(0, minDisplayMs - elapsed);
-    setTimeout(() => {
-      if (overlay) overlay.style.display = 'none';
-      onAllImagesLoaded();
-    }, wait);
-    return;
-  }
-
-  
-  /*  ========================================================================  *\
-      KÉPEK BETÖLTÉSE
-  \*  ========================================================================  */
-
-  imageFiles.forEach(src => {
-    const img = new Image();
-    img.onload = img.onerror = () => {
-      loaded++;
-      updatePercent();
-      // Frissítse a kör alapú betöltési sávot
-      const pctEl = document.getElementById('loading-percentage');
-      const circle = document.getElementById('circle-fg');
-      const pct = Math.round((loaded / total) * 100);
-      if (pctEl) pctEl.innerText = pct + '%';
-      if (circle) {
-        const circumference = 2 * Math.PI * 45; // r=45
-        const offset = Math.round(circumference - (pct / 100) * circumference);
-        // Debug: ellenőrizze a számított értékeket
-        try {
-          console.debug('[loader] pct=', pct, 'offset=', offset);
-        } catch (e) {}
-
-        // Az offset beállítása a stroke-dashoffset tulajdonságon keresztül
-        try {
-          circle.setAttribute('stroke-dashoffset', String(offset));
-        } catch (e) {
-          // tartalékos megoldás régebbi böngészők számára
-          circle.style.strokeDashoffset = offset;
-        }
-
-        // Debug: ellenőrizze a számított stílust
-        try {
-          const computed = window.getComputedStyle(circle);
-          const strokeVal = computed.getPropertyValue('stroke');
-          console.debug('[loader] computed stroke:', strokeVal);
-          if (!strokeVal || strokeVal.indexOf('url(') === -1) {
-            // Ha a stroke nem megfelelően van alkalmazva, alkalmazzon egy tartalék osztályt
-            circle.classList.add('fallback');
-          }
-        } catch (e) {
-          // Nem sikerült lekérdezni a számított stílust
-        }
-      }
-      const progressBar = document.querySelector('.circular-wrap');
-      if (progressBar) progressBar.setAttribute('aria-valuenow', pct);
-    };
-    img.src = src;
-  });
-
-
-/*  ========================================================================  *\
-      POLLOLÁS AZ ÖSSZES KÉP BETÖLTŐDÉSÉHEZ
-\*  ========================================================================  */
-
-  const poll = setInterval(() => {
-    updatePercent();
-    const elapsed = performance.now() - start;
-    if (loaded >= total && elapsed >= minDisplayMs) {
-      clearInterval(poll);
-      if (overlay) overlay.style.display = 'none';
-      onAllImagesLoaded();
+    function updatePercent() {
+        const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
+        percentEl.innerText = `${pct}%`;
     }
-  }, 100);
+
+    if (total === 0) {
+        const elapsed = performance.now() - start;
+        const wait = Math.max(0, minDisplayMs - elapsed);
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            onAllImagesLoaded();
+        }, wait);
+        return;
+    }
+
+    imageFiles.forEach(src => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+            loaded++;
+            updatePercent();
+            const pct = Math.round((loaded / total) * 100);
+            const circle = document.getElementById('circle-fg');
+            if (circle) {
+                const circumference = 2 * Math.PI * 45;
+                const offset = Math.round(circumference - (pct / 100) * circumference);
+                circle.style.strokeDashoffset = offset;
+            }
+        };
+        img.src = src;
+    });
+
+    const poll = setInterval(() => {
+        updatePercent();
+        const elapsed = performance.now() - start;
+        if (loaded >= total && elapsed >= minDisplayMs) {
+            clearInterval(poll);
+            overlay.style.display = 'none';
+            onAllImagesLoaded();
+        }
+    }, 100);
 }
 
 
 /*  ========================================================================  *\
-      DOM CONTENT LOADED ESEMÉNY KEZELÉSE
+      DOM CONTENT LOADED ESEMÉNYKEZELŐ
 \*  ========================================================================  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Indítsa el a preloader-t, és töltse be az alapértelmezett játékot
-  const startPreloader = () => whenAllImagesLoaded(() => loadDefaultGame(), 5000);
+    const startPreloader = () => whenAllImagesLoaded(() => loadDefaultGame(), 5000);
 
-  if (typeof loadPageInto === 'function') {
-    loadPageInto('#gameContainer', 'page/loading.html')
-      .then(() => startPreloader())
-      .catch(() => startPreloader());
-  } else {
-    // Ha a loadPageInto nincs definiálva, csak indítsa el a preloader-t
-    startPreloader();
-  }
+    if (typeof loadPageInto === 'function') {
+        loadPageInto('#gameContainer', 'page/loading.html')
+            .then(() => startPreloader())
+            .catch(() => startPreloader());
+    } else {
+        startPreloader();
+    }
+
+    if (levelSelector) {
+        levelSelector.addEventListener('change', function () {
+            setDifficulty(this.value);
+        });
+    }
+
+    if (actionButton) {
+        actionButton.addEventListener('click', function () {
+            const difficulty = levelSelector ? levelSelector.value : 'easy';
+            if (difficulty) {
+                setDifficulty(difficulty);
+                stopTimer();
+                resetTimer();
+            } else {
+                alert('Válassz nehézségi szintet a játék indítása előtt!');
+            }
+        });
+    }
 });
 
-/* ======================================================================== *\
-     E N D   O F   F I N D E R S . J S
-\* ======================================================================== */
+
+/*  ========================================================================  *\
+      E N D   O F   F I N D E R S . J S
+\*  ========================================================================  */
