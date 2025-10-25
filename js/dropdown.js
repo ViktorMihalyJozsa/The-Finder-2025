@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownContent.style.opacity = 1; 
         })
         .catch(error => { 
-            console.error('Hiba a dropdown tartalmának betöltésekor:', error);  
-            dropdownContent.innerHTML = '<p>Nem sikerült betölteni a tartalmat.</p>'; 
+            console.error('Error loading dropdown content:', error);  
+            dropdownContent.innerHTML = '<p>Failed to load content.</p>'; 
         });
 
     dropdownContent.style.transition = 'opacity 3s ease-in-out'; 

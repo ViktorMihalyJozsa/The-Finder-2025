@@ -290,25 +290,10 @@ main {
             flex-direction:   column;
             justify-content:  center;
             align-items:      center;
-            gap:              1rem;
+            gap:              1.5rem;
 
             z-index:          1000;
         }
-
-            #loading-title h3 {
-                text-transform:  uppercase;
-                text-align:      center;
-
-                font-size:       2rem;
-                color:           beige;
-            }
-
-            #loading-sub p {
-                text-align:  center;
-
-                font-size:   1.4rem;
-                color:       beige;
-            }
 
         /* A kör alakú töltésjelző konténer */
         .circular-wrap {
@@ -354,7 +339,7 @@ main {
             width:            80%;
             height:           80%;
 
-            background:       rgba(0, 0, 0, 0.25);
+            background:       rgba(0, 0, 0, 0.1);
             backdrop-filter:  blur(3px);
 
             border:           1px solid rgba(255, 255, 255, 0.1);
@@ -365,15 +350,10 @@ main {
 
         /* A százalék szöveg */
         .progress-percent {
-            pointer-events:  none;
-
-            font-size:       2rem;
-            font-weight:     700;
-            color:           rgb(255, 255, 255, 0.9);
-            text-shadow:     0 0 0.5rem rgba(255, 255, 255, 0.9);
+            pointer-events:  none;  /* Ne zavarja a felhasználói interakciókat */
         }
 
-        /* Forgaló animáció */
+        /* Forgó animáció a körhöz */
         @keyframes rotate-ring {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }

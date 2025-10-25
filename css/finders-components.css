@@ -275,6 +275,39 @@ header {
             L O A D I N G   O V E R L A Y
         \* ======================================================================== */
 
+        .loading-title {
+            text-transform:  uppercase;
+            text-align:      center;
+
+            font-size:       2rem;
+            font-weight:     bold;
+            letter-spacing:  0.2rem;
+            line-height:     3rem;
+            color:           rgba(245, 245, 220, 0.75);
+            text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
+        }
+
+                .progress-percent {
+                    font-size:       3rem;
+                    font-weight:     bold;
+                    letter-spacing:  0.1rem;
+                    line-height:     3rem;
+                    color:           rgb(255, 255, 255, 0.9);
+                    text-shadow:     0 0 5px rgba(0, 0, 0, 0.5);
+                }
+
+        .loading-sub {
+            text-transform:  uppercase;
+            text-align:      center;
+
+            font-size:       1.5rem;
+            font-weight:     bold;
+            letter-spacing:  0.15rem;
+            line-height:     2rem;
+            color:           rgba(245, 245, 220, 0.75);
+            text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
+        }
+
 
 /* ======================================================================== *\
     F O O T E R

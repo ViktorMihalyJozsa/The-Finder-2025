@@ -68,24 +68,9 @@ const timeCounter = document.getElementById('time-counter');
 \*  ========================================================================  */
 
 const difficultySettings = {
-  easy: {
-    size: controlPanelWidth / 8,
-    columns: 8,
-    rows: 8,
-    targetCount: 8
-  },
-  medium: {
-    size: controlPanelWidth / 10,
-    columns: 10,
-    rows: 10,
-    targetCount: 12
-  },
-  hard: {
-    size: controlPanelWidth / 12,
-    columns: 12,
-    rows: 12,
-    targetCount: 16
-  }
+  easy: {size: controlPanelWidth / 8, columns: 8, rows: 8, targetCount: 8},
+  medium: {size: controlPanelWidth / 10, columns: 10, rows: 10, targetCount: 12},
+  hard: {size: controlPanelWidth / 12, columns: 12, rows: 12, targetCount: 16}
 };
 
 
@@ -795,5 +780,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ======================================================================== *\
-   E N D   O F   F I N D E R S . J S
+     E N D   O F   F I N D E R S . J S
 \* ======================================================================== */
