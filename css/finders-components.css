@@ -15,10 +15,9 @@
                 3.1.1 A C T I O N - B U T T O N
                 3.1.2 M A R K E R   A N D   T I M E R
                 3.1.3 G A M E - I N F O   A N D   L E V E L - S E L E C T O R
-                3.1.4 D R O P D O W N - C O N T E N T
-                3.1.5 G A M E - P A G E
             3.2 G A M E - C O N T A I N E R
                 3.2.1 L O A D I N G   O V E R L A Y
+                3.2.2 G A M E - P A G E
         4. F O O T E R
 
 \* ======================================================================== */
@@ -181,55 +180,6 @@ header {
             }
 
 
-        /* ======================================================================== *\
-            D R O P D O W N - C O N T E N T
-        \* ======================================================================== */
-
-        .dropdown-content {
-            background-color:  rgba(206, 146, 0, 0.9);
-        }
-
-
-        /* ======================================================================== *\
-            G A M E - P A G E
-        \* ======================================================================== */
-
-        .game-info-page {
-            text-align:  center;
-        }
-
-            h3 {
-                margin:          1.5rem 0rem 0.5rem 0rem;
-
-                font-size:       clamp(1.2rem, 2.4vw, 1.8em);
-                font-weight:     bold;
-                letter-spacing:  clamp(0.12rem, 0.24vw, 0.18em);
-                color:           rgba(255, 255, 255, 0.25);
-                text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
-            }
-
-            p {
-                font-size:       clamp(1rem, 2vw, 1.5em);
-                letter-spacing:  clamp(0.1rem, 0.2vw, 0.15em);
-                color:           rgba(255, 255, 255, 0.25);
-                text-shadow:     -0.1em -0.1em black;
-            }
-
-            a {
-                text-decoration:  none;
-                font-size:        clamp(1.5rem, 2vw, 1.5em);
-                letter-spacing:   clamp(0.15rem, 0.2vw, 0.15em);
-                color:            rgba(206, 146, 0, 0.75);
-                text-shadow:      0.1rem 0.1rem 0.1rem rgba(68, 68, 68, 1), -0.1rem -0.1rem black;
-            }
-
-                a:hover {
-                    text-decoration:  none;
-                    color:            rgba(139, 0, 0, 0.75);
-                    transition:       color 0.5s;
-                }
-
-
     /* ======================================================================== *\
         G A M E - C O N T A I N E R
     \* ======================================================================== */
@@ -309,6 +259,135 @@ header {
             color:           rgba(245, 245, 220, 0.75);
             text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
         }
+        
+
+        /* ======================================================================== *\
+            G A M E - P A G E
+        \* ======================================================================== */
+
+        .game-info-page,
+        .level-selector-page,
+        .level-buttons {
+            display:          flex;
+            flex-direction:   column;
+            align-items:      center;
+            justify-content:  flex-start;
+
+            text-align:       center;
+        }
+
+            h3 {
+                margin:          1.5rem 0rem 0.5rem 0rem;
+
+                font-size:       clamp(1.2rem, 2.4vw, 1.8em);
+                font-weight:     bold;
+                letter-spacing:  clamp(0.12rem, 0.24vw, 0.18em);
+                line-height:     clamp(1.2rem, 2.4vw, 1.8em);
+                color:           rgba(255, 255, 255, 0.25);
+                text-shadow:     0.25em 0.25em 0.25em rgba(68, 68, 68, 1), -0.1em -0.1em black;
+            }
+
+            p {
+                font-size:       clamp(1rem, 2vw, 1.5em);
+                letter-spacing:  clamp(0.1rem, 0.2vw, 0.15em);
+                color:           rgba(255, 255, 255, 0.25);
+                text-shadow:     -0.1em -0.1em black;
+            }
+
+            a {
+                text-decoration:  none;
+                font-size:        clamp(1.5rem, 2vw, 1.5em);
+                letter-spacing:   clamp(0.15rem, 0.2vw, 0.15em);
+                color:            rgba(206, 146, 0, 0.75);
+                text-shadow:      0.1rem 0.1rem 0.1rem rgba(68, 68, 68, 1), -0.1rem -0.1rem black;
+            }
+
+                a:hover {
+                    text-decoration:  none;
+                    color:            rgba(139, 0, 0, 0.75);
+                    transition:       color 0.5s;
+                }
+
+
+            /*  ========================================================================  *\
+                D R O P D O W N - C O N T E N T
+                A #dropdown-content stílusa, amely a #gameContainer tetején jelenik meg
+                áttetsző háttérrel, fade-in és scale animációval (0.5s).
+            \*  ========================================================================  */
+
+            #dropdown-content {
+                display: none; /* Kezdetben rejtve van */
+                position: absolute; /* Dinamikus pozícionálás a finders.js által */
+                background-color: rgba(206, 146, 0, 0.9); /* Áttetsző háttér */
+                border: 0.1vh solid black; /* Keret */
+                border-radius: 1vh; /* Lekerekített sarkok */
+                padding: 2vh; /* Belső margó */
+                overflow-y: auto; /* Görgethető, ha a tartalom túl nagy */
+                scrollbar-width: none; /* Firefox: scrollbar elrejtése */
+                z-index: 10; /* A játéktábla fölött */
+                opacity: 0; /* Kezdetben láthatatlan */
+                transform: scale(0.8); /* Kezdetben kisebb méret */
+                transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* 0.5s animáció */
+            }
+
+            #dropdown-content.show {
+                display: block; /* Megjelenítés */
+                opacity: 1; /* Teljesen látható */
+                transform: scale(1); /* Normál méret */
+            }
+
+            #dropdown-content:not(.show) {
+                opacity: 0; /* Eltűnik */
+                transform: scale(0.8); /* Kisebbre zsugorodik */
+            }
+
+            #dropdown-content::-webkit-scrollbar {
+                display: none; /* Webkit böngészők: scrollbar elrejtése */
+            }
+
+            /*  ========================================================================  *\
+                L E V E L - B U T T O N S
+                A nehézségi szint gombok stílusa a level-selector-page.html .level-buttons div-jében.
+                Általános gombstílus a <button> elemekre, amelyek a nehézségi szinteket választják.
+            \*  ========================================================================  */
+
+            .level-buttons button {
+                cursor:            pointer; /* Kéz ikon */
+
+                background-color:  rgba(255, 255, 255, 0.125); /* Áttetsző fehér háttér */
+                transition:        background-color 0.3s; /* Háttérszín átmenet */
+
+                border:            0.1vh solid black; /* Keret */
+                border-radius:     1vh 2vh 1vh 2vh; /* Lekerekített sarkok */
+
+                width:             auto; /* Automatikus szélesség */
+                height:            auto; /* Automatikus magasság */
+                margin:            0rem 0rem 1rem 0rem; /* Külső margó */
+                padding:           0.5rem 2rem 0.5rem 2rem; /* Belső margó */
+
+                text-transform:    uppercase; /* Nagybetűs szöveg */
+                font-family:       'Caveat', sans-serif; /* Betűtípus */
+                font-size:         clamp(1rem, 2vw, 1.5rem); /* Reszponzív betűméret */
+                font-weight:       bold; /* Félkövér betű */
+                letter-spacing:    clamp(0.2rem, 0.4vw, 0.3em); /* Betűköz */
+                line-height:       clamp(1rem, 2vw, 1.5rem); /* Sormagasság */
+                color:             rgba(206, 146, 0, 1); /* Szöveg színe */
+                text-shadow:       0.125rem 0.125rem 0.25rem black, -0.1rem -0.1rem black; /* Szöveg árnyék */
+            }
+
+                .level-buttons button:hover {
+                    background-color:  rgba(255, 255, 255, 0.75); /* Teljesen fehér háttér hover esetén */
+                }
+
+            /*  ========================================================================  *\
+                M A I N - A C T I O N - B U T T O N
+                A #main-action-button stílusa, amely a betöltési fázis alatt nem kattintható.
+            \*  ========================================================================  */
+
+            #main-action-button.loading {
+                pointer-events: none; /* Nem kattintható a betöltés alatt */
+                opacity: 1; /* Vizuális visszajelzés a deaktiválásról */
+            }
 
 
 /* ======================================================================== *\

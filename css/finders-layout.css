@@ -15,11 +15,11 @@
                 3.1.1 A C T I O N - B U T T O N
                 3.1.2 M A R K E R   A N D   T I M E R
                 3.1.3 G A M E - I N F O   A N D   L E V E L - S E L E C T O R
-                3.1.4 D R O P D O W N - C O N T E N T
-                3.1.5 G A M E - P A G E
             3.2 G A M E - C O N T A I N E R
                 3.2.1 L O A D I N G   O V E R L A Y
+                3.2.2 G A M E - P A G E
         4. F O O T E R
+        5. M E D I A - Q U E R I E S
 
 \* ======================================================================== */
 
@@ -211,53 +211,7 @@ main {
             height:           4.5vh;  /* 30% of the control panel */  
             padding:          0;
             margin:           0;
-        }
-
-
-        /* ======================================================================== *\
-            D R O P D O W N - C O N T E N T
-        \* ======================================================================== */
-
-            #dropdown-content {
-                display:          none;                                           /* Kezdetben rejtve van */
-                position:         absolute;                                       /* Pozicionálás */
-                top:              27.5vh;                                         /* A szekrény tetején kezdődik */
-                left:             50%;                                            /* Középre igazítás */
-                transform:        translateX(-50%);                               /* Középre igazítás */
-
-                width:            30vw;                                           /* 30%-a a szekrény szélességének */
-                height:           0;                                              /* Kezdetben 0 a magasság */
-                padding-bottom:   3vh;                                            /* 3% padding az alján */
-                margin:           0;
-
-                overflow:         hidden;                                         /* Túlcsordulás elrejtése */
-                scrollbar-width:  none;                                           /* Firefox */
-                transition:       height 3s ease-in-out, opacity 3s ease-in-out;  /* Animáció hozzáadása */
-                z-index:          1;                                              /* A legfelső réteg */
-            }
-            
-                #dropdown-content.show {
-                    display:     block;  /* Megjelenítés */
-                    height:      30vw;   /* Változtasd ezt az értéket, ha szükséges */
-                    overflow-y:  auto;   /* Enable vertical scrolling */
-                    opacity:     1;      /* Az áttetszőség is változik */
-                }
-            
-                #dropdown-content::-webkit-scrollbar {
-                    display:  none; /* Webkit böngészőkön a scrollbar eltüntetése */
-                }                       
-
-
-        /* ======================================================================== *\
-            G A M E - P A G E
-        \* ======================================================================== */
-
-        .game-info-page {
-            display:  block;
-            width:    100%;
-            height:   100%;
-            padding:  1vh 2vh 3vh 2vh;
-        }
+        }                     
 
 
     /* ======================================================================== *\
@@ -358,6 +312,16 @@ main {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+
+        /* ======================================================================== *\
+            G A M E - P A G E
+        \* ======================================================================== */
+
+
+            /* ======================================================================== *\
+                D R O P D O W N - C O N T E N T
+            \* ======================================================================== */
 
 
 /* ======================================================================== *\

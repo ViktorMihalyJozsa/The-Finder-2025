@@ -1,42 +1,45 @@
 /*  ========================================================================  *\
 
     F I N D E R S . J S
-
     A finders.js fájl tartalmazza a kereső játék logikáját és funkcióit.
-
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    A fájl tartalmazza a következő funkciókat:
-
-        - DOM elemek kiválasztása
-        - Nehézségi beállítások definiálása
-        - Mezők és játék állapotok kezelése
-        - Segédfunkciók
-        - Térkép és boolean map létrehozása
-        - Mezők megjelenítése a játéktáblán
-        - Játék kezdetének méretezése
-        - Játék kezdete
-        - Játék újraindítása
-        - Nehézségi beállítások változtatása
-        - Időzítő kezelése
-        - Célok elhelyezése a térképen
-        - Mezők keresése és számlálása
-        - Számított mezőértékek
-        - Felfedezetlen mezők felfedezése
-        - Játék vége ellenőrzése
-        - Játék kimenetei
-        - Action-gomb állapotának frissítése
-        - Célok megjelölve
-        - Egér pozíció kiszámítása
-        - Kattintás eseménykezelők
-        - Mezők érvényessége
-        - Képek betöltésének kezelése
-        - DOM Content Loaded eseménykezelő
 
 \*  ========================================================================  */
 
 /*  ========================================================================  *\
-      DOM ELEMEK KIVÁLASZTÁSA
+
+      T A R T A L O M J E G Y Z É K
+      1. DOM ELEMEK KIVÁLASZTÁSA ÉS LÉTREHOZÁSA
+      2. NEHÉZSÉGI BEÁLLÍTÁSOK DEFINIÁLÁSA
+      3. MEZŐK ÉS JÁTÉK ÁLLAPOTOK KEZELÉSE
+      4. SEGÉDFUNKCIÓK
+      5. TÉRKÉP ÉS BOOLEAN MAP LÉTREHOZÁSA
+      6. MEZŐK MEGJELENÍTÉSE A JÁTÉKTÁBLÁN
+      7. JÁTÉK KEZDETÉNEK MÉRETEZÉSE
+      8. JÁTÉK KEZDETE
+      9. JÁTÉK ÚJRAINDÍTÁSA
+      10. NEHÉZSÉGI BEÁLLÍTÁSOK VÁLTOZTATÁSA
+      11. IDŐZÍTŐ KEZELÉSE
+      12. CÉLOK ELHELYEZÉSE A TÉRKÉPEN
+      13. MEZŐK KERESÉSE ÉS SZÁMLÁLÁSA
+      14. SZÁMÍTOTT MEZŐÉRTÉKEK
+      15. FELFEDEZETLEN MEZŐK FELFEDEZÉSE
+      16. JÁTÉK VÉGE ELLENŐRZÉSE
+      17. JÁTÉK KIMENETEI
+      18. ACTION-GOMB ÁLLAPOTÁNAK FRISSÍTÉSE
+      19. CÉLOK ÉS MARADÉK MEZŐK MEGJELENÍTÉSE
+      20. EGÉR POZÍCIÓ KISZÁMÍTÁSA
+      21. KATTINTÁS ESEMÉNYKEZELŐK
+      22. MEZŐK ÉRVÉNYESSÉGE
+      23. KÉPEK BETÖLTÉSÉNEK KEZELÉSE
+      24. LENYÍLÓ MENÜ KEZELÉSE
+      25. DOM CONTENT LOADED ESEMÉNYKEZELŐ
+      
+\*  ========================================================================  */
+
+/*  ========================================================================  *\
+      1. DOM ELEMEK KIVÁLASZTÁSA ÉS LÉTREHOZÁSA
+      A játékhoz szükséges DOM elemeket kiválasztjuk, és létrehozzuk a 
+      #dropdown-content elemet dinamikusan.
 \*  ========================================================================  */
 
 const gameContainer = document.getElementById('gameContainer');
@@ -44,29 +47,49 @@ const controlPanel = document.getElementById('control-panel');
 const actionButton = document.getElementById('main-action-button');
 const markerCounter = document.getElementById('marker-counter');
 const timeCounter = document.getElementById('time-counter');
+const gameInfo = document.getElementById('game-info');
 const levelSelector = document.getElementById('level-selector');
 
+// Dinamikusan létrehozzuk a #dropdown-content elemet
+function createDropdownContent() {
+    const dropdownContent = document.createElement('div');
+    dropdownContent.id = 'dropdown-content';
+    dropdownContent.className = 'dropdown-content ui-element';
+    // A #gameContainer pozíciójához igazítjuk
+    const rect = gameContainer.getBoundingClientRect();
+    dropdownContent.style.position = 'absolute';
+    dropdownContent.style.left = `${rect.left + window.scrollX}px`;
+    dropdownContent.style.top = `${rect.top + window.scrollY}px`;
+    dropdownContent.style.width = `${gameContainer.offsetWidth}px`;
+    dropdownContent.style.height = `${gameContainer.offsetHeight}px`;
+    dropdownContent.style.opacity = '0';
+    dropdownContent.style.transform = 'scale(0.8)';
+    dropdownContent.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+    document.body.appendChild(dropdownContent);
+    return dropdownContent;
+}
+
+const dropdownContent = createDropdownContent();
+
+// A #main-action-button kezdetben nem kattintható
+if (actionButton) {
+    actionButton.classList.add('loading');
+}
 
 /*  ========================================================================  *\
-      NEHÉZSÉGI BEÁLLÍTÁSOK DEFINIÁLÁSA
+      2. NEHÉZSÉGI BEÁLLÍTÁSOK DEFINIÁLÁSA
+      A játék nehézségi szintjeinek beállításai (oszlopok, sorok, célok száma).
 \*  ========================================================================  */
 
-/*
-    Minden nehézségi szinthez definiáljuk:
-        - sorok és oszlopok számát
-        - teljes célpontszámot
-        - mezőméret számításhoz használt divisor
-        - célpontok értékének minimumát és maximumát
-*/
 const difficultySettings = {
     easy:   { columns: 8,  rows: 8,  targetCount: 10, divisor: 8,  minTargetValue: 1, maxTargetValue: 3 },
     medium: { columns: 10, rows: 10, targetCount: 20, divisor: 10, minTargetValue: 1, maxTargetValue: 5 },
     hard:   { columns: 12, rows: 12, targetCount: 30, divisor: 12, minTargetValue: 1, maxTargetValue: 8 }
 };
 
-
 /*  ========================================================================  *\
-      MEZŐK ÉS JÁTÉK ÁLLAPOTOK KEZELÉSE
+      3. MEZŐK ÉS JÁTÉK ÁLLAPOTOK KEZELÉSE
+      A játék állapotváltozói, mint a méret, oszlopok, sorok, célok száma.
 \*  ========================================================================  */
 
 let size, columns, rows, targetCount;
@@ -79,43 +102,41 @@ let exploredMap = [];
 let remainingTargets = 0;
 let timer = null;
 let seconds = 0;
-
+let isLoading = true; // Betöltési állapot nyomon követése
 
 /*  ========================================================================  *\
-      SEGÉDFUNKCIÓK
+      4. SEGÉDFUNKCIÓK
+      Segédfunkciók a vezérlőpanel szélességéhez, mezőméret kiszámításához és 
+      számformázáshoz.
 \*  ========================================================================  */
 
-/* — Biztonságos vezérlőpanel szélesség kiszámítás — */
 function safeControlPanelWidth() {
     const w = controlPanel && controlPanel.offsetWidth ? controlPanel.offsetWidth : Math.min(window.innerWidth, 600);
     return w;
 }
 
-/* — Mezőméret kiszámítása az aktuális ablak / panel szélesség alapján — */
 function computeSizeFor(difficulty) {
     const div = difficultySettings[difficulty].divisor || 10;
-    return Math.max(20, Math.floor(safeControlPanelWidth() / div)); // min. 20px
+    return Math.max(20, Math.floor(safeControlPanelWidth() / div));
 }
 
-/* — Szám konvertálása 3 karakter hosszú sztringgé — */
 const convertNumberTo3DigitString = (number) => {
     return number < 0 ? '🤡' : number.toString().padStart(3, '0');
 };
 
-
 /*  ========================================================================  *\
-      TÉRKÉP ÉS BOOLEAN MAP LÉTREHOZÁSA
+      5. TÉRKÉP ÉS BOOLEAN MAP LÉTREHOZÁSA
+      A játéktábla és a logikai térképek inicializálása.
 \*  ========================================================================  */
 
 const createMap = () => Array.from({ length: rows }, () => Array(columns).fill(0));
 const createBooleanMap = () => Array.from({ length: rows }, () => Array(columns).fill(false));
 
-
 /*  ========================================================================  *\
-      MEZŐK MEGJELENÍTÉSE A JÁTÉKTÁBLÁN
+      6. MEZŐK MEGJELENÍTÉSE A JÁTÉKTÁBLÁN
+      A játéktábla mezőinek kirajzolása a #gameContainer-be.
 \*  ========================================================================  */
 
-/* — Egy mező kirajzolása a játéktáblára — */
 function drawField(row, col, className) {
     const field = document.createElement('div');
     field.className = `field ${className}`;
@@ -129,7 +150,6 @@ function drawField(row, col, className) {
     gameContainer.appendChild(field);
 }
 
-/* — Térkép kirajzolása (teljes frissítés) — */
 const drawMap = () => {
     if (!gameContainer) return;
     gameContainer.innerHTML = '';
@@ -152,9 +172,9 @@ const drawMap = () => {
     }
 };
 
-
 /*  ========================================================================  *\
-      JÁTÉK KEZDETÉNEK MÉRETEZÉSE
+      7. JÁTÉK KEZDETÉNEK MÉRETEZÉSE
+      A játéktábla méretének beállítása a nehézségi szint alapján.
 \*  ========================================================================  */
 
 function applyContainerSize() {
@@ -162,11 +182,17 @@ function applyContainerSize() {
     gameContainer.style.setProperty('--field-size', `${size}px`);
     gameContainer.style.width = `${columns * size}px`;
     gameContainer.style.height = `${rows * size}px`;
+    // Frissítjük a #dropdown-content pozícióját
+    const rect = gameContainer.getBoundingClientRect();
+    dropdownContent.style.left = `${rect.left + window.scrollX}px`;
+    dropdownContent.style.top = `${rect.top + window.scrollY}px`;
+    dropdownContent.style.width = `${gameContainer.offsetWidth}px`;
+    dropdownContent.style.height = `${gameContainer.offsetHeight}px`;
 }
 
-
-/*  ========================================================================  *\  
-      JÁTÉK KEZDETE
+/*  ========================================================================  *\
+      8. JÁTÉK KEZDETE
+      A játék inicializálása az alapértelmezett beállításokkal.
 \*  ========================================================================  */
 
 function initGame() {
@@ -185,9 +211,9 @@ function initGame() {
     drawMap();
 }
 
-
 /*  ========================================================================  *\
-      JÁTÉK ÚJRAINDÍTÁSA
+      9. JÁTÉK ÚJRAINDÍTÁSA
+      Az alapértelmezett játék betöltése "easy" nehézségi szinttel.
 \*  ========================================================================  */
 
 function loadDefaultGame() {
@@ -201,9 +227,9 @@ function loadDefaultGame() {
     initGame();
 }
 
-
 /*  ========================================================================  *\
-      NEHÉZSÉGI BEÁLLÍTÁSOK VÁLTOZTATÁSA
+      10. NEHÉZSÉGI BEÁLLÍTÁSOK VÁLTOZTATÁSA
+      A nehézségi szint váltása a játék újraindításával.
 \*  ========================================================================  */
 
 function setDifficulty(difficulty) {
@@ -225,9 +251,9 @@ function setDifficulty(difficulty) {
     initGame();
 }
 
-
 /*  ========================================================================  *\
-      IDŐZÍTŐ KEZELÉSE
+      11. IDŐZÍTŐ KEZELÉSE
+      Az időzítő indítása, leállítása és visszaállítása.
 \*  ========================================================================  */
 
 function startTimer() {
@@ -255,13 +281,13 @@ function resetTimerDisplay() {
     timeCounter.innerText = convertNumberTo3DigitString(0);
 }
 
-
 /*  ========================================================================  *\
-      CÉLOK ELHELYEZÉSE A TÉRKÉPEN
+      12. CÉLOK ELHELYEZÉSE A TÉRKÉPEN
+      A célpontok véletlenszerű elhelyezése a játéktáblán.
 \*  ========================================================================  */
 
 const placeTargets = (mapRef, tCount, startRow, startCol) => {
-    const { minTargetValue, maxTargetValue } = difficultySettings[levelSelector.value || 'easy'];
+    const { minTargetValue, maxTargetValue } = difficultySettings[levelSelector.dataset.level || 'easy'];
     let placed = 0;
     while (placed < tCount) {
         const x = Math.floor(Math.random() * columns);
@@ -275,9 +301,9 @@ const placeTargets = (mapRef, tCount, startRow, startCol) => {
     }
 };
 
-
 /*  ========================================================================  *\
-      MEZŐK KERESÉSE ÉS SZÁMLÁLÁSA
+      13. MEZŐK KERESÉSE ÉS SZÁMLÁLÁSA
+      A szomszédos mezők keresése és a célpontok számlálása.
 \*  ========================================================================  */
 
 const findNeighbourFields = (mapRef, rowI, colI) => {
@@ -300,9 +326,9 @@ function countMarkedNeighbours(coords) {
     return coords.reduce((acc, { row, col }) => acc + (markerMap[row][col] ? 1 : 0), 0);
 }
 
-
 /*  ========================================================================  *\
-      SZÁMÍTOTT MEZŐÉRTÉKEK
+      14. SZÁMÍTOTT MEZŐÉRTÉKEK
+      A mezők értékeinek kiszámítása a szomszédos célpontok alapján.
 \*  ========================================================================  */
 
 function calculateFieldValues(mapRef) {
@@ -317,9 +343,9 @@ function calculateFieldValues(mapRef) {
     }
 }
 
-
 /*  ========================================================================  *\
-      FELFEDEZETLEN MEZŐK FELFEDEZÉSE
+      15. FELFEDEZETLEN MEZŐK FELFEDEZÉSE
+      A mezők rekurzív felfedezése, ha üres mezőre kattintunk.
 \*  ========================================================================  */
 
 function exploreField(startR, startC) {
@@ -340,9 +366,9 @@ function exploreField(startR, startC) {
     }
 }
 
-
 /*  ========================================================================  *\
-      JÁTÉK VÉGE ELLENŐRZÉSE
+      16. JÁTÉK VÉGE ELLENŐRZÉSE
+      Ellenőrzi, hogy a játék véget ért-e (győzelem vagy vereség).
 \*  ========================================================================  */
 
 function allTargetsMarkedCorrectly() {
@@ -373,9 +399,9 @@ function checkGameEnd(row, col) {
     }
 }
 
-
 /*  ========================================================================  *\
-      JÁTÉK KIMENETEI
+      17. JÁTÉK KIMENETEI
+      A játék vége: győzelem vagy vereség kezelése.
 \*  ========================================================================  */
 
 function winGame() {
@@ -390,24 +416,29 @@ function loseGame() {
     revealExploredTarget();
     showWrongMarkers();
     showUnmarkedTargets();
+    revealRemainingFields(); // Új függvény a maradék mezők felfedésére
     stopTimer();
 }
 
-
 /*  ========================================================================  *\
-      ACTION-GOMB ÁLLAPOTÁNAK FRISSÍTÉSE
+      18. ACTION-GOMB ÁLLAPOTÁNAK FRISSÍTÉSE
+      A fő akció gomb állapotának frissítése (start, won, lost).
 \*  ========================================================================  */
 
 function updateActionButton(state) {
+    if (!actionButton) return;
     actionButton.className = '';
     if (state === 'start') actionButton.classList.add('button-start');
     else if (state === 'won') actionButton.classList.add('button-won');
     else if (state === 'lost') actionButton.classList.add('button-lost');
+    if (!isLoading) {
+        actionButton.classList.remove('loading');
+    }
 }
 
-
 /*  ========================================================================  *\
-      CÉLOK MEGJELÖLVE
+      19. CÉLOK ÉS MARADÉK MEZŐK MEGJELENÍTÉSE
+      A célpontok, hibás jelölések és maradék számozott mezők megjelenítése vereség esetén.
 \*  ========================================================================  */
 
 function revealExploredTarget() {
@@ -443,9 +474,24 @@ function showWrongMarkers() {
     }
 }
 
+function revealRemainingFields() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            const cell = map[r][c];
+            const isTarget = cell && cell.type === 'target';
+            const isExplored = exploredMap[r][c];
+            const isMarked = markerMap[r][c];
+            if (!isTarget && !isExplored && !isMarked) {
+                exploredMap[r][c] = true; // Jelöljük felfedezettként
+                drawField(r, c, cell === 0 ? 'number-0' : `number-${cell}`);
+            }
+        }
+    }
+}
 
 /*  ========================================================================  *\
-      EGÉR POZÍCIÓ KISZÁMÍTÁSA
+      20. EGÉR POZÍCIÓ KISZÁMÍTÁSA
+      Az egér pozíciójának kiszámítása a játéktáblán belül.
 \*  ========================================================================  */
 
 function getMousePosition(event) {
@@ -455,14 +501,14 @@ function getMousePosition(event) {
     return { row: Math.floor(y / size), col: Math.floor(x / size) };
 }
 
-
 /*  ========================================================================  *\
-      KATTINTÁS ESEMÉNYKEZELŐK
+      21. KATTINTÁS ESEMÉNYKEZELŐK
+      A játéktábla kattintásainak és jobb kattintásainak kezelése.
 \*  ========================================================================  */
 
 if (gameContainer) {
     gameContainer.addEventListener('click', function (event) {
-        if (isGameOver) return;
+        if (isGameOver || isLoading) return;
         const { row, col } = getMousePosition(event);
         if (!isValidField(row, col)) return;
 
@@ -480,7 +526,7 @@ if (gameContainer) {
 
     gameContainer.addEventListener('contextmenu', function (event) {
         event.preventDefault();
-        if (isGameOver) return;
+        if (isGameOver || isLoading) return;
         const { row, col } = getMousePosition(event);
         if (!isValidField(row, col)) return;
 
@@ -505,18 +551,19 @@ if (gameContainer) {
     });
 }
 
-
 /*  ========================================================================  *\
-      MEZŐK ÉRVÉNYESSÉGE
+      22. MEZŐK ÉRVÉNYESSÉGE
+      Ellenőrzi, hogy egy mező érvényes-e a játéktáblán belül.
 \*  ========================================================================  */
 
 function isValidField(row, col) {
     return typeof row === 'number' && typeof col === 'number' && row >= 0 && row < rows && col >= 0 && col < columns;
 }
 
-
 /*  ========================================================================  *\
-      KÉPEK BETÖLTÉSÉNEK KEZELÉSE
+      23. KÉPEK BETÖLTÉSÉNEK KEZELÉSE
+      A játék képeinek betöltése és a betöltési folyamat kezelése.
+      A #main-action-button csak a betöltés befejezése után válik kattinthatóvá.
 \*  ========================================================================  */
 
 const imageFiles = [
@@ -526,7 +573,7 @@ const imageFiles = [
     'images/button-lost.webp',
     'images/button-won.webp',
     'images/counter.webp',
-    'images/0.webp','images/1.webp','images/2.webp','images/3.webp','images/4.webp','images/5.webp','images/6.webp','images/7.webp','images/8.webp',
+    'images/0.webp', 'images/1.webp', 'images/2.webp', 'images/3.webp', 'images/4.webp', 'images/5.webp', 'images/6.webp', 'images/7.webp', 'images/8.webp',
     'images/hidden.webp',
     'images/target.webp',
     'images/unmarked-target.webp',
@@ -537,21 +584,34 @@ const imageFiles = [
 
 function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
     const total = imageFiles.length;
-    const percentEl = document.getElementById('loading-percentage');
-    const overlay = document.getElementById('loading-overlay');
     const start = performance.now();
     let loaded = 0;
 
     function updatePercent() {
+        const percentEl = document.getElementById('loading-percentage');
+        const overlay = document.getElementById('loading-overlay');
+        if (!percentEl || !overlay) {
+            console.warn('Nem található a #loading-percentage vagy #loading-overlay elem.');
+            return;
+        }
         const pct = total === 0 ? 100 : Math.round((loaded / total) * 100);
         percentEl.innerText = `${pct}%`;
+        const circle = document.querySelector('.circular');
+        if (circle) {
+            const circumference = 2 * Math.PI * 45;
+            const offset = Math.round(circumference - (pct / 100) * circumference);
+            circle.style.strokeDashoffset = offset;
+        }
     }
 
     if (total === 0) {
         const elapsed = performance.now() - start;
         const wait = Math.max(0, minDisplayMs - elapsed);
         setTimeout(() => {
-            overlay.style.display = 'none';
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'none';
+            isLoading = false;
+            if (actionButton) actionButton.classList.remove('loading');
             onAllImagesLoaded();
         }, wait);
         return;
@@ -559,16 +619,14 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
 
     imageFiles.forEach(src => {
         const img = new Image();
-        img.onload = img.onerror = () => {
+        img.onload = () => {
             loaded++;
             updatePercent();
-            const pct = Math.round((loaded / total) * 100);
-            const circle = document.getElementById('circle-fg');
-            if (circle) {
-                const circumference = 2 * Math.PI * 45;
-                const offset = Math.round(circumference - (pct / 100) * circumference);
-                circle.style.strokeDashoffset = offset;
-            }
+        };
+        img.onerror = () => {
+            console.warn(`Hiba a kép betöltésekor: ${src}`);
+            loaded++;
+            updatePercent();
         };
         img.src = src;
     });
@@ -578,48 +636,168 @@ function whenAllImagesLoaded(onAllImagesLoaded, minDisplayMs = 5000) {
         const elapsed = performance.now() - start;
         if (loaded >= total && elapsed >= minDisplayMs) {
             clearInterval(poll);
-            overlay.style.display = 'none';
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'none';
+            isLoading = false;
+            if (actionButton) actionButton.classList.remove('loading');
             onAllImagesLoaded();
         }
     }, 100);
 }
 
+/*  ========================================================================  *\
+      24. LENYÍLÓ MENÜ KEZELÉSE
+      A #game-info és #level-selector gombok kezelése, a #dropdown-content 
+      megjelenítése és elrejtése a #gameContainer tetején. Váltáskor 0.4s várakozás.
+\*  ========================================================================  */
+
+function setupDropdown() {
+    if (!gameInfo || !levelSelector || !dropdownContent) {
+        console.error('Hiba: Nem található a gameInfo, levelSelector vagy dropdownContent!');
+        return;
+    }
+
+    // Segédfunkció a #dropdown-content elrejtéséhez
+    function hideDropdown(callback) {
+        if (dropdownContent.classList.contains('show')) {
+            dropdownContent.classList.remove('show');
+            dropdownContent.style.opacity = '0';
+            dropdownContent.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                if (callback) callback();
+            }, 400); // Csökkentett várakozási idő (0.4s) a gyorsabb váltásért
+        } else if (callback) {
+            callback();
+        }
+    }
+
+    // Eseménykezelő a #game-info gombra
+    gameInfo.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (isLoading) return;
+        if (dropdownContent.classList.contains('show') && dropdownContent.dataset.content === 'game-info') {
+            hideDropdown();
+        } else {
+            hideDropdown(() => {
+                dropdownContent.dataset.content = 'game-info';
+                fetch('page/game-info-page.html')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP hiba: ${response.status}`);
+                        return response.text();
+                    })
+                    .then(data => {
+                        dropdownContent.innerHTML = data;
+                        dropdownContent.classList.add('show');
+                        dropdownContent.style.opacity = '1';
+                        dropdownContent.style.transform = 'scale(1)';
+                    })
+                    .catch(error => {
+                        console.error('Hiba a game-info-page.html betöltésekor:', error);
+                        dropdownContent.innerHTML = '<p>Hiba a tartalom betöltésekor.</p>';
+                        dropdownContent.classList.add('show');
+                        dropdownContent.style.opacity = '1';
+                        dropdownContent.style.transform = 'scale(1)';
+                    });
+            });
+        }
+    });
+
+    // Eseménykezelő a #level-selector gombra
+    levelSelector.addEventListener('click', function(event) {
+        event.stopPropagation();
+        if (isLoading) return;
+        if (dropdownContent.classList.contains('show') && dropdownContent.dataset.content === 'level-selector') {
+            hideDropdown();
+        } else {
+            hideDropdown(() => {
+                dropdownContent.dataset.content = 'level-selector';
+                fetch('page/level-selector-page.html')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP hiba: ${response.status}`);
+                        return response.text();
+                    })
+                    .then(data => {
+                        dropdownContent.innerHTML = data;
+                        dropdownContent.classList.add('show');
+                        dropdownContent.style.opacity = '1';
+                        dropdownContent.style.transform = 'scale(1)';
+                        // Eseménykezelők a nehézségi szint gombokra
+                        const buttons = dropdownContent.querySelectorAll('.level-buttons button');
+                        if (buttons.length === 0) {
+                            console.warn('Nem található .level-buttons button elem a level-selector-page.html-ben!');
+                        }
+                        buttons.forEach(button => {
+                            button.removeAttribute('onclick');
+                            button.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const level = this.textContent.toLowerCase();
+                                if (level && difficultySettings[level]) {
+                                    setDifficulty(level);
+                                    levelSelector.dataset.level = level;
+                                    hideDropdown();
+                                } else {
+                                    console.warn('Érvénytelen nehézségi szint:', level);
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Hiba a level-selector-page.html betöltésekor:', error);
+                        dropdownContent.innerHTML = '<p>Hiba a tartalom betöltésekor.</p>';
+                        dropdownContent.classList.add('show');
+                        dropdownContent.style.opacity = '1';
+                        dropdownContent.style.transform = 'scale(1)';
+                    });
+            });
+        }
+    });
+
+    // Kattintás a dokumentum más részére: #dropdown-content elrejtése
+    document.addEventListener('click', function(event) {
+        if (isLoading) return;
+        if (!gameInfo.contains(event.target) && !levelSelector.contains(event.target) && !dropdownContent.contains(event.target)) {
+            hideDropdown();
+        }
+    });
+}
 
 /*  ========================================================================  *\
-      DOM CONTENT LOADED ESEMÉNYKEZELŐ
+      25. DOM CONTENT LOADED ESEMÉNYKEZELŐ
+      Az oldal betöltésekor inicializáljuk a játékot és a lenyíló menüt.
+      A #main-action-button csak a betöltés befejezése után válik aktívvá.
 \*  ========================================================================  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const startPreloader = () => whenAllImagesLoaded(() => loadDefaultGame(), 5000);
-
-    if (typeof loadPageInto === 'function') {
-        loadPageInto('#gameContainer', 'page/loading.html')
-            .then(() => startPreloader())
-            .catch(() => startPreloader());
-    } else {
-        startPreloader();
-    }
-
-    if (levelSelector) {
-        levelSelector.addEventListener('change', function () {
-            setDifficulty(this.value);
+    fetch('page/loading.html')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP hiba: ${response.status}`);
+            return response.text();
+        })
+        .then(data => {
+            gameContainer.innerHTML = data;
+            whenAllImagesLoaded(() => {
+                loadDefaultGame();
+                setupDropdown();
+            }, 5000);
+        })
+        .catch(error => {
+            console.error('Hiba a loading.html betöltésekor:', error);
+            whenAllImagesLoaded(() => {
+                loadDefaultGame();
+                setupDropdown();
+            }, 5000);
         });
-    }
 
     if (actionButton) {
         actionButton.addEventListener('click', function () {
-            const difficulty = levelSelector ? levelSelector.value : 'easy';
-            if (difficulty) {
-                setDifficulty(difficulty);
-                stopTimer();
-                resetTimer();
-            } else {
-                alert('Válassz nehézségi szintet a játék indítása előtt!');
-            }
+            if (isLoading) return;
+            const difficulty = levelSelector.dataset.level || 'easy';
+            setDifficulty(difficulty);
+            stopTimer();
+            resetTimer();
         });
     }
 });
-
 
 /*  ========================================================================  *\
       E N D   O F   F I N D E R S . J S
