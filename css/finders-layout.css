@@ -160,13 +160,13 @@ main {
         .marker-counter-number {
             position:  absolute;
             top:       1vh;
-            left:      0;
+            left:      0.5vw;
         }
 
         .time-counter-number {
             position:  absolute;
             top:       1vh;
-            right:     0;
+            right:     0.5vw;
         }
 
         .marker-counter-number, 
@@ -179,8 +179,6 @@ main {
             height:           auto;
             padding:          0;
             margin:           0;
-            border:           0.1vh solid black;
-            border-radius:    1vh;
         }
 
 
@@ -191,13 +189,13 @@ main {
         .game-info-text {
             position:  absolute;
             bottom:    1vh;
-            left:      0vw;
+            left:      0.5vw;
         }
 
         .level-selector-text {
             position:  absolute;
             bottom:    1vh;
-            right:     0vw;
+            right:     0.5vw;
         }
 
         .game-info-text,
@@ -271,14 +269,14 @@ main {
             border-radius:   50%;
         
             background:      conic-gradient(
-                            rgba(255, 159, 10, 0) 0deg,
-                            rgba(255, 159, 10, 0.2) 180deg,
-                            rgba(255, 159, 10, 0.5) 240deg,
-                            rgba(255, 159, 10, 0.8) 300deg,
-                            rgba(255, 159, 10, 1) 360deg
+                             rgba(255, 159, 10, 0) 0deg,
+                             rgba(255, 159, 10, 0.2) 180deg,
+                             rgba(255, 159, 10, 0.5) 240deg,
+                             rgba(255, 159, 10, 0.8) 300deg,
+                             rgba(255, 159, 10, 1) 360deg
             );
             box-shadow:      0 0 30px rgba(255, 159, 10, 0.7),
-                            0 0 60px rgba(255, 159, 10, 0.4);
+                             0 0 60px rgba(255, 159, 10, 0.4);
             animation:       rotate-ring 2s linear infinite;
         }
 

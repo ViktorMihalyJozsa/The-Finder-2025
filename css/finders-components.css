@@ -138,10 +138,14 @@ header {
 
         .marker-counter-number,
         .time-counter-number {
-            background-image:     url("../images/counter.webp");
+            background-image:     url("../images/button-counter-timer.webp");
             background-size:      cover;
             background-repeat:    no-repeat;
             background-position:  center;
+
+            border:               0.1vh solid black;
+            border-radius:        1vh;
+            box-shadow:           0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
 
             font-size:            clamp(2rem, 3.2vw, 2.4em);
             font-weight:          bold;
@@ -185,40 +189,44 @@ header {
     \* ======================================================================== */
 
     .game-container-style {
-        border:            0.1vh solid black;
-        background-color:  rgb(0, 0, 0, 0.5);
+        border: 0.1vh solid black;
+        background-color: rgb(0, 0, 0, 0.5);
     }
 
-        .field {
-            position:             absolute;
-            box-sizing:           border-box;
-            width:                var(--field-size);
-            height:               var(--field-size);
+    .field {
+        position: absolute;
+        box-sizing: border-box;
+        width: var(--field-size);
+        height: var(--field-size);
+        border: 0.0625rem solid rgba(0, 0, 0, 0.75);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0; /* Kezdetben láthatatlan */
+        transform: scale(0.8); /* Kezdetben kisebb méret */
+        transition: opacity 0.3s ease, transform 0.3s ease; /* Animáció */
+    }
 
-            border:               0.0625rem solid rgba(0, 0, 0, 0.75);  /* 1px solid black */
-    
-            background-size:      cover;
-            background-repeat:    no-repeat;
-            background-position:  center;
-        }
-        
-        .field.number-0 {background-image: url('../images/0.webp');}
-    
-        .number-0 {background-image: url('../images/0.webp');}
-        .number-1 {background-image: url('../images/1.webp');}
-        .number-2 {background-image: url('../images/2.webp');}
-        .number-3 {background-image: url('../images/3.webp');}
-        .number-4 {background-image: url('../images/4.webp');}
-        .number-5 {background-image: url('../images/5.webp');}
-        .number-6 {background-image: url('../images/6.webp');}
-        .number-7 {background-image: url('../images/7.webp');}
-        .number-8 {background-image: url('../images/8.webp');}
-    
-        .hidden {background-image: url('../images/hidden.webp');}
-        .target {background-image: url('../images/target.webp');}
-        .unmarked-target {background-image: url('../images/unmarked-target.webp');}
-        .marker {background-image: url('../images/marker.webp');}
-        .incorrect-marker {background-image: url('../images/incorrect-marker.webp');}
+    .field.visible {
+        opacity: 1; /* Teljesen látható */
+        transform: scale(1); /* Normál méret */
+    }
+
+    .field.number-0 {background-image: url('../images/0.webp');}
+    .number-0 {background-image: url('../images/0.webp');}
+    .number-1 {background-image: url('../images/1.webp');}
+    .number-2 {background-image: url('../images/2.webp');}
+    .number-3 {background-image: url('../images/3.webp');}
+    .number-4 {background-image: url('../images/4.webp');}
+    .number-5 {background-image: url('../images/5.webp');}
+    .number-6 {background-image: url('../images/6.webp');}
+    .number-7 {background-image: url('../images/7.webp');}
+    .number-8 {background-image: url('../images/8.webp');}
+    .hidden {background-image: url('../images/hidden.webp');}
+    .target {background-image: url('../images/target.webp');}
+    .unmarked-target {background-image: url('../images/unmarked-target.webp');}
+    .marker {background-image: url('../images/marker.webp');}
+    .incorrect-marker {background-image: url('../images/incorrect-marker.webp');}
 
 
         /* ======================================================================== *\
@@ -330,19 +338,19 @@ header {
                 scrollbar-width: none; /* Firefox: scrollbar elrejtése */
                 z-index: 10; /* A játéktábla fölött */
                 opacity: 0; /* Kezdetben láthatatlan */
-                transform: scale(0.8); /* Kezdetben kisebb méret */
-                transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* 0.5s animáció */
+                transform: translateY(-20px); /* Kezdetben feljebb van */
+                transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* 0.3s animáció */
             }
 
             #dropdown-content.show {
                 display: block; /* Megjelenítés */
                 opacity: 1; /* Teljesen látható */
-                transform: scale(1); /* Normál méret */
+                transform: translateY(0); /* Normál pozíció */
             }
 
             #dropdown-content:not(.show) {
                 opacity: 0; /* Eltűnik */
-                transform: scale(0.8); /* Kisebbre zsugorodik */
+                transform: translateY(-20px); /* Feljebb csúszik */
             }
 
             #dropdown-content::-webkit-scrollbar {
@@ -358,11 +366,16 @@ header {
             .level-buttons button {
                 cursor:            pointer; /* Kéz ikon */
 
-                background-color:  rgba(255, 255, 255, 0.25); /* Áttetsző fehér háttér */
-                transition:        background-color 0.3s; /* Háttérszín átmenet */
+                background-color:     rgba(255, 255, 255, 0.25); /* Áttetsző fehér háttér */
+                background-image:     url("../images/button-level-selector.webp"); /* Háttérkép */
+                background-size:      cover; /* Kitölti a gombot */
+                background-repeat:    no-repeat; /* Nem ismétlődik */
+                background-position:  center; /* Középre igazítva */
+                transition:           background-color 0.3s; /* Háttérszín átmenet */
 
                 border:            0.1vh solid black; /* Keret */
                 border-radius:     1vh 2vh 1vh 2vh; /* Lekerekített sarkok */
+                box-shadow:        0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75); /* Árnyék */
 
                 width:             auto; /* Automatikus szélesség */
                 height:            auto; /* Automatikus magasság */
@@ -381,7 +394,10 @@ header {
 
                 .level-buttons button:hover {
                     background-color:  rgba(255, 255, 255, 0.75); /* Teljesen fehér háttér hover esetén */
-                }
+                    filter:            brightness(1.2);
+                    transition:        filter 0.8s;
+            }
+
 
             /*  ========================================================================  *\
                 M A I N - A C T I O N - B U T T O N

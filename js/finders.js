@@ -137,7 +137,7 @@ const createBooleanMap = () => Array.from({ length: rows }, () => Array(columns)
       A játéktábla mezőinek kirajzolása a #gameContainer-be.
 \*  ========================================================================  */
 
-function drawField(row, col, className) {
+function drawField(row, col, className, animate = false) {
     const field = document.createElement('div');
     field.className = `field ${className}`;
     field.dataset.row = row;
@@ -148,6 +148,14 @@ function drawField(row, col, className) {
     field.style.width = `${size}px`;
     field.style.height = `${size}px`;
     gameContainer.appendChild(field);
+    // Animáció csak akkor, ha animate true
+    if (animate) {
+        setTimeout(() => {
+            field.classList.add('visible');
+        }, 10);
+    } else {
+        field.classList.add('visible'); // Azonnali megjelenés animáció nélkül
+    }
 }
 
 const drawMap = () => {
@@ -160,13 +168,13 @@ const drawMap = () => {
             const field = map[r][c];
 
             if (!isExplored) {
-                drawField(r, c, isMarked ? 'marker' : 'hidden');
+                drawField(r, c, isMarked ? 'marker' : 'hidden', false);
             } else if (field && field.type === 'target') {
-                drawField(r, c, 'target');
+                drawField(r, c, 'target', false);
             } else if (field === 0) {
-                drawField(r, c, 'number-0');
+                drawField(r, c, 'number-0', false);
             } else {
-                drawField(r, c, `number-${field}`);
+                drawField(r, c, `number-${field}`, false);
             }
         }
     }
@@ -413,11 +421,12 @@ function winGame() {
 function loseGame() {
     isGameOver = true;
     updateActionButton('lost');
-    revealExploredTarget();
-    showWrongMarkers();
-    showUnmarkedTargets();
-    revealRemainingFields(); // Új függvény a maradék mezők felfedésére
     stopTimer();
+    // Időzített animált felfedés 500ms késleltetéssel
+    setTimeout(() => revealExploredTarget(), 0);
+    setTimeout(() => showWrongMarkers(), 500);
+    setTimeout(() => showUnmarkedTargets(), 1000);
+    setTimeout(() => revealRemainingFields(), 1500);
 }
 
 /*  ========================================================================  *\
@@ -446,7 +455,7 @@ function revealExploredTarget() {
         for (let c = 0; c < columns; c++) {
             const cell = map[r][c];
             if (cell && cell.type === 'target' && exploredMap[r][c]) {
-                drawField(r, c, 'target');
+                drawField(r, c, 'target', true);
             }
         }
     }
@@ -457,7 +466,7 @@ function showUnmarkedTargets() {
         for (let c = 0; c < columns; c++) {
             const cell = map[r][c];
             if (cell && cell.type === 'target' && !markerMap[r][c] && !exploredMap[r][c]) {
-                drawField(r, c, 'unmarked-target');
+                drawField(r, c, 'unmarked-target', true);
             }
         }
     }
@@ -468,7 +477,7 @@ function showWrongMarkers() {
         for (let c = 0; c < columns; c++) {
             const cell = map[r][c];
             if (markerMap[r][c] && (!cell || cell.type !== 'target')) {
-                drawField(r, c, 'incorrect-marker');
+                drawField(r, c, 'incorrect-marker', true);
             }
         }
     }
@@ -483,7 +492,7 @@ function revealRemainingFields() {
             const isMarked = markerMap[r][c];
             if (!isTarget && !isExplored && !isMarked) {
                 exploredMap[r][c] = true; // Jelöljük felfedezettként
-                drawField(r, c, cell === 0 ? 'number-0' : `number-${cell}`);
+                drawField(r, c, cell === 0 ? 'number-0' : `number-${cell}`, true);
             }
         }
     }
@@ -572,7 +581,8 @@ const imageFiles = [
     'images/button-start.webp',
     'images/button-lost.webp',
     'images/button-won.webp',
-    'images/counter.webp',
+    'images/button-counter-timer.webp',
+    'images/button-level-selector.webp',
     'images/0.webp', 'images/1.webp', 'images/2.webp', 'images/3.webp', 'images/4.webp', 'images/5.webp', 'images/6.webp', 'images/7.webp', 'images/8.webp',
     'images/hidden.webp',
     'images/target.webp',
@@ -662,10 +672,10 @@ function setupDropdown() {
         if (dropdownContent.classList.contains('show')) {
             dropdownContent.classList.remove('show');
             dropdownContent.style.opacity = '0';
-            dropdownContent.style.transform = 'scale(0.8)';
+            dropdownContent.style.transform = 'translateY(-20px)';
             setTimeout(() => {
                 if (callback) callback();
-            }, 400); // Csökkentett várakozási idő (0.4s) a gyorsabb váltásért
+            }, 200); // Csökkentett várakozási idő (0.2s)
         } else if (callback) {
             callback();
         }
@@ -689,14 +699,14 @@ function setupDropdown() {
                         dropdownContent.innerHTML = data;
                         dropdownContent.classList.add('show');
                         dropdownContent.style.opacity = '1';
-                        dropdownContent.style.transform = 'scale(1)';
+                        dropdownContent.style.transform = 'translateY(0)';
                     })
                     .catch(error => {
                         console.error('Hiba a game-info-page.html betöltésekor:', error);
                         dropdownContent.innerHTML = '<p>Hiba a tartalom betöltésekor.</p>';
                         dropdownContent.classList.add('show');
                         dropdownContent.style.opacity = '1';
-                        dropdownContent.style.transform = 'scale(1)';
+                        dropdownContent.style.transform = 'translateY(0)';
                     });
             });
         }
@@ -720,7 +730,7 @@ function setupDropdown() {
                         dropdownContent.innerHTML = data;
                         dropdownContent.classList.add('show');
                         dropdownContent.style.opacity = '1';
-                        dropdownContent.style.transform = 'scale(1)';
+                        dropdownContent.style.transform = 'translateY(0)';
                         // Eseménykezelők a nehézségi szint gombokra
                         const buttons = dropdownContent.querySelectorAll('.level-buttons button');
                         if (buttons.length === 0) {
@@ -746,7 +756,7 @@ function setupDropdown() {
                         dropdownContent.innerHTML = '<p>Hiba a tartalom betöltésekor.</p>';
                         dropdownContent.classList.add('show');
                         dropdownContent.style.opacity = '1';
-                        dropdownContent.style.transform = 'scale(1)';
+                        dropdownContent.style.transform = 'translateY(0)';
                     });
             });
         }
