@@ -122,6 +122,14 @@ header {
             background-position:  center;
         }
 
+            #main-action-button.loading,
+            #main-action-button.disabled {
+                pointer-events:  none;
+                opacity:         1;                    /* Látható visszajelzés */
+                filter:          blackscale(1) brightness(1.2);
+                cursor:          not-allowed;
+            }
+
             #main-action-button:hover {
                 filter:      brightness(1.2);
                 transition:  filter 0.8s;
@@ -175,6 +183,16 @@ header {
             color:             rgba(255, 255, 255, 0.75);
             text-shadow:       0.125rem 0.125rem 0.25rem black, -0.1rem -0.1rem black;
         }
+
+            /*.game-info-text.loading,
+            .level-selector-text.loading,
+            .game-info-text.disabled,
+            .level-selector-text.disabled {
+                pointer-events:  none;
+                opacity:         0.6;                    /* Látható visszajelzés */
+            /*    filter:          grayscale(1) brightness(0.8);
+                cursor:          not-allowed;
+            }*/
 
             .game-info-text:hover, 
             .level-selector-text:hover {
@@ -396,17 +414,6 @@ header {
                     background-color:  rgba(255, 255, 255, 0.75); /* Teljesen fehér háttér hover esetén */
                     filter:            brightness(1.2);
                     transition:        filter 0.8s;
-            }
-
-
-            /*  ========================================================================  *\
-                M A I N - A C T I O N - B U T T O N
-                A #main-action-button stílusa, amely a betöltési fázis alatt nem kattintható.
-            \*  ========================================================================  */
-
-            #main-action-button.loading {
-                pointer-events: none; /* Nem kattintható a betöltés alatt */
-                opacity: 1; /* Vizuális visszajelzés a deaktiválásról */
             }
 
 
