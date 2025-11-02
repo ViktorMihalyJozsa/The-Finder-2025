@@ -344,6 +344,51 @@ footer {
     M E D I A - Q U E R I E S
 \* ======================================================================== */
 
+@media screen and (max-width: 1024px) {
+    .control-panel-container {
+        width:   80vw;  /* 80% of the screen width */
+        height:  20vw;  /* 20% of the screen height */
+    }
+        .marker-counter-number,
+        .time-counter-number {
+            width:   24vw;  /* 30% of the control panel */
+            height:  auto;  /* Auto height */
+        }
+
+        .game-info-text,
+        .level-selector-text {
+            width:   24vw;  /* 30% of the control panel */
+            height:  6vw;   /* 30% of the control panel */
+        }
+
+        #dropdown-content {
+            display:    none;
+            height:     80vw;
+            top:        31vh;
+            left:       50%;
+            transform:  translateX(-50%);
+
+            width:      80vw;
+            height:     0;
+        }
+
+            #dropdown-content.show {
+                height:     80vw;
+            }
+
+            /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+            #dropdown-content::-webkit-scrollbar {
+                display:  none;
+            }
+
+    #gameContainer {
+        width:         80vw;   /* 80% of the screen width */
+        max-width:     600px;  /* Maximum width */
+        height:        auto;   /* Auto height */
+        aspect-ratio:  1 / 1;  /* 1:1 aspect ratio */
+    }
+}
+
 @media screen and (max-width: 768px) {
     .control-panel-container {
         width:   80vw;  /* 80% of the screen width */
