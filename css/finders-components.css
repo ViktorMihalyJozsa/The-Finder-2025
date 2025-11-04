@@ -151,10 +151,6 @@ header {
             background-repeat:    no-repeat;
             background-position:  center;
 
-            border:               0.1vh solid black;
-            border-radius:        1vh;
-            box-shadow:           0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
-
             font-size:            clamp(2rem, 3.2vw, 2.4em);
             font-weight:          bold;
             letter-spacing:       clamp(0.2rem, 0.32vw, 0.24em);
@@ -173,8 +169,6 @@ header {
             text-decoration:   none;
 
             background-color:  rgba(206, 146, 0, 0.9);
-            border:            0.1vh solid black;
-            border-radius:     1vh;
 
             font-family:       'Caveat', sans-serif;
             font-size:         clamp(1rem, 1.5vw, 1.25em);

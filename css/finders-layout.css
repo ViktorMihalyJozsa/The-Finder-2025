@@ -124,12 +124,13 @@ main {
         position:       relative;
 
         width:          30vw;  /* 30% of the screen width */
-        height:         15vh;  /* 15% of the screen height */
-        margin-bottom:  1vh;
+        max-width:      600px;
+        height:         calc(15vh + 1rem);  /* 15% of the screen height */
+        margin-bottom:  0;
         padding:        0;
 
         border:         none;
-        border-radius:  1vh;
+        border-radius:  1rem 1rem 0rem 0rem;
     }
 
 
@@ -139,17 +140,17 @@ main {
 
         #main-action-button {
             position:       absolute;
-            top:            0;
+            top:            auto;
             left:           50%;
             transform:      translateX(-50%);
 
             width:          30%;   /* 30% of the control panel */
-            height:         100%;  /* 100% of the control panel */
-            margin:         0;
+            height:         15vh;  /* 100% of the control panel */
+            margin:         0.5rem 0rem 0.5rem 0rem;
             padding:        0;
 
             border:         0.1vh solid black;
-            border-radius:  1.5vh;
+            border-radius:  1rem;
         }
 
 
@@ -158,15 +159,23 @@ main {
         \* ======================================================================== */
 
         .marker-counter-number {
-            position:  absolute;
-            top:       1vh;
-            left:      0.5vw;
+            position:       absolute;
+            top:            0.5rem;
+            left:           0.5rem;
+
+            border:         0.1rem solid black;
+            border-radius:  1rem 0.5rem 0.5rem 0.5rem;
+            box-shadow:     0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
         }
 
         .time-counter-number {
-            position:  absolute;
-            top:       1vh;
-            right:     0.5vw;
+            position:       absolute;
+            top:            0.5rem;
+            right:          0.5rem;
+
+            border:         0.1rem solid black;
+            border-radius:  0.5rem 1rem 0.5rem 0.5rem;
+            box-shadow:     0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
         }
 
         .marker-counter-number, 
@@ -187,15 +196,23 @@ main {
         \* ======================================================================== */
 
         .game-info-text {
-            position:  absolute;
-            bottom:    1vh;
-            left:      0.5vw;
+            position:       absolute;
+            bottom:         0;
+            left:           0.5rem;
+
+            border:         0.1rem solid black;
+            border-radius:  1rem 1rem 0rem 0rem;
+            box-shadow:     0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
         }
 
         .level-selector-text {
-            position:  absolute;
-            bottom:    1vh;
-            right:     0.5vw;
+            position:       absolute;
+            bottom:         0;
+            right:          0.5rem;
+
+            border:         0.1rem solid black;
+            border-radius:  1rem 1rem 0rem 0rem;
+            box-shadow:     0.2rem 0.2rem 0.4rem rgba(0, 0, 0, 0.75);
         }
 
         .game-info-text,
@@ -392,8 +409,24 @@ footer {
 @media screen and (max-width: 768px) {
     .control-panel-container {
         width:   80vw;  /* 80% of the screen width */
-        height:  20vw;  /* 20% of the screen height */
+        height:  calc(15vh + 1rem);  /* 20% of the screen height */
     }
+
+        #main-action-button {
+            position:       absolute;
+            top:            auto;
+            left:           50%;
+            transform:      translateX(-50%);
+
+            width:          30%;   /* 30% of the control panel */
+            height:         15vh;  /* 100% of the control panel */
+            margin:         0.5rem 0rem 0.5rem 0rem;
+            padding:        0;
+
+            border:         0.1vh solid black;
+            border-radius:  1rem;
+        }
+
         .marker-counter-number,
         .time-counter-number {
             width:   24vw;  /* 30% of the control panel */
