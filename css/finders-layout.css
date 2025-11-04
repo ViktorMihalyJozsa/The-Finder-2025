@@ -364,7 +364,7 @@ footer {
 @media screen and (max-width: 1024px) {
     .control-panel-container {
         width:   80vw;  /* 80% of the screen width */
-        height:  20vw;  /* 20% of the screen height */
+        height:  calc(22vw + 1rem);  /* 20% of the screen height */
     }
 
         #main-action-button {
@@ -373,8 +373,8 @@ footer {
             left:           50%;
             transform:      translateX(-50%);
 
-            width:          30vw;   /* 30% of the control panel */
-            height:         30vw;  /* 100% of the control panel */
+            width:          22vw;   /* 30% of the control panel */
+            height:         22vw;  /* 100% of the control panel */
             margin:         0.5rem 0rem 0.5rem 0rem;
             padding:        0;
 
@@ -425,7 +425,7 @@ footer {
 @media screen and (max-width: 768px) {
     .control-panel-container {
         width:   80vw;  /* 80% of the screen width */
-        height:  calc(15vh + 1rem);  /* 20% of the screen height */
+        height:  calc(22vw + 1rem);  /* 20% of the screen height */
     }
 
         #main-action-button {
@@ -434,8 +434,8 @@ footer {
             left:           50%;
             transform:      translateX(-50%);
 
-            width:          25vw;   /* 30% of the control panel */
-            height:         25vw;  /* 100% of the control panel */
+            width:          22vw;   /* 30% of the control panel */
+            height:         22vw;  /* 100% of the control panel */
             margin:         0.5rem 0rem 0.5rem 0rem;
             padding:        0;
 
