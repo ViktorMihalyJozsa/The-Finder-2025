@@ -434,8 +434,8 @@ footer {
             left:           50%;
             transform:      translateX(-50%);
 
-            width:          30vw;   /* 30% of the control panel */
-            height:         30vw;  /* 100% of the control panel */
+            width:          25vw;   /* 30% of the control panel */
+            height:         25vw;  /* 100% of the control panel */
             margin:         0.5rem 0rem 0.5rem 0rem;
             padding:        0;
 
