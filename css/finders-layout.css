@@ -366,6 +366,22 @@ footer {
         width:   80vw;  /* 80% of the screen width */
         height:  20vw;  /* 20% of the screen height */
     }
+
+        #main-action-button {
+            position:       absolute;
+            top:            auto;
+            left:           50%;
+            transform:      translateX(-50%);
+
+            width:          30vw;   /* 30% of the control panel */
+            height:         30vw;  /* 100% of the control panel */
+            margin:         0.5rem 0rem 0.5rem 0rem;
+            padding:        0;
+
+            border:         0.1vh solid black;
+            border-radius:  1rem;
+        }
+
         .marker-counter-number,
         .time-counter-number {
             width:   24vw;  /* 30% of the control panel */
@@ -418,8 +434,8 @@ footer {
             left:           50%;
             transform:      translateX(-50%);
 
-            width:          30%;   /* 30% of the control panel */
-            height:         15vh;  /* 100% of the control panel */
+            width:          30vw;   /* 30% of the control panel */
+            height:         30vw;  /* 100% of the control panel */
             margin:         0.5rem 0rem 0.5rem 0rem;
             padding:        0;
 
